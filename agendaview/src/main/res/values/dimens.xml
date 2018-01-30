@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="agenda_view_hour_height">60dp</dimen>
+    <dimen name="agenda_view_day_name_size">10sp</dimen>
+    <dimen name="agenda_view_day_size">18sp</dimen>
+</resources>

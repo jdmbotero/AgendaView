@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AgendaView.iml" filepath="$PROJECT_DIR$/AgendaView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/agendaview/agendaview.iml" filepath="$PROJECT_DIR$/agendaview/agendaview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>

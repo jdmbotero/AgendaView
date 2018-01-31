@@ -1,6 +1,7 @@
 package com.github.jdmbotero.agendaview.model
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 data class Day(
         var date: Calendar,
@@ -9,5 +10,5 @@ data class Day(
         var daysPagerPos: Int = 0,
         var daysPos: Int = 0,
         var agendaPagerPos: Int = 0,
-        var events: ArrayList<Event>? = null
+        var events: kotlin.collections.ArrayList<Event> = ArrayList()
 )

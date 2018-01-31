@@ -6,8 +6,12 @@ import android.view.ViewGroup
 import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.adapter.viewholder.AgendaPagerViewHolder
 import com.github.jdmbotero.agendaview.model.Day
+import io.reactivex.subjects.PublishSubject
+import java.util.*
 
 class AgendaPagerAdapter(items: ArrayList<Day>) : RecyclerView.Adapter<AgendaPagerViewHolder>() {
+
+    val observable = PublishSubject.create<Calendar>()!!
 
     var items: ArrayList<Day> = items
         set(items) {
@@ -24,7 +28,6 @@ class AgendaPagerAdapter(items: ArrayList<Day>) : RecyclerView.Adapter<AgendaPag
     }
 
     override fun onBindViewHolder(holder: AgendaPagerViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], observable)
     }
-
 }

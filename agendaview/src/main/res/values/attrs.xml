@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="AgendaView">
-        <attr name="color" format="color" />
+        <attr name="firstDay" format="integer" />
+        <attr name="numberOfDays" format="integer" />
+        <attr name="showNewEventInClick" format="boolean" />
+        <attr name="newEventTimeInMinutes" format="integer" />
+        <attr name="newEventColor" format="color" />
+        <attr name="newEventTextColor" format="color" />
     </declare-styleable>
 </resources>

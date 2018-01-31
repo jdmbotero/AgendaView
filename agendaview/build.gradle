@@ -29,7 +29,7 @@ android {
 }
 
 ext {
-    support_version = '27.0.2'
+    support_version = '27.0.1'
     rx_version = '2.2.0'
     rx_binding_version = '2.0.0'
 }
@@ -53,4 +53,6 @@ dependencies {
     compile "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:$rx_binding_version"
     compile "com.jakewharton.rxbinding2:rxbinding-design-kotlin:$rx_binding_version"
     compile "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rx_binding_version"
+
+    compile 'com.bartoszlipinski:viewpropertyobjectanimator:1.4.5'
 }

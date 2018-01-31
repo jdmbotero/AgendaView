@@ -4,6 +4,7 @@
     android:layout_height="match_parent">
 
     <com.github.jdmbotero.agendaview.AgendaView
+        android:id="@+id/agendaView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

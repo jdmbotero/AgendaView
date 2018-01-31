@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AgendaView.iml" filepath="$PROJECT_DIR$/AgendaView.iml" />
+      <module fileurl="file://C:\Users\danie\workspace\android\AgendaView\AgendaView.iml" filepath="C:\Users\danie\workspace\android\AgendaView\AgendaView.iml" />
       <module fileurl="file://$PROJECT_DIR$/agendaview/agendaview.iml" filepath="$PROJECT_DIR$/agendaview/agendaview.iml" />
+      <module fileurl="file://C:\Users\danie\workspace\android\AgendaView\agendaview\agendaview.iml" filepath="C:\Users\danie\workspace\android\AgendaView\agendaview\agendaview.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\danie\workspace\android\AgendaView\app\app.iml" filepath="C:\Users\danie\workspace\android\AgendaView\app\app.iml" />
     </modules>
   </component>
 </project>

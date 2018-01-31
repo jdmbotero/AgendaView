@@ -1,5 +1,6 @@
 package com.github.jdmbotero.agendaview.adapter.viewholder
 
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.View
@@ -11,11 +12,13 @@ import com.github.jdmbotero.agendaview.util.DateManager
 
 class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
+    private var scrollView: NestedScrollView = view.findViewById(R.id.scrollView)
     private var textCurrentDate: TextView = view.findViewById(R.id.textCurrentDate)
     private var contentHours: LinearLayout = view.findViewById(R.id.contentHours)
     private var listEvents: RecyclerView = view.findViewById(R.id.listEvents)
 
     fun bind(day: Day) {
+        scrollView.scrollTo(0, 0)
         textCurrentDate.text = DateManager.getFormatDate(day.date)
 
         initHours()

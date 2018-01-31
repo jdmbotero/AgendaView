@@ -3,6 +3,7 @@ package com.github.jdmbotero.agendaview
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
+import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -13,6 +14,7 @@ import com.github.jdmbotero.agendaview.model.Week
 import kotlinx.android.synthetic.main.view_agenda.view.*
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class AgendaView : FrameLayout {
 
@@ -72,26 +74,29 @@ class AgendaView : FrameLayout {
     private fun initDays() {
         days.clear()
         weeks.clear()
-        var weekPosition = -1
+        var daysPosition = -1
 
         for (i in 0..daysCount) {
-            val date = Calendar.getInstance()
+            if (weeks.size == 0 || weeks[daysPosition].days.size >= 7) {
+                weeks.add(Week(ArrayList()))
+                daysPosition++
+            }
 
+            val date = Calendar.getInstance()
             date.time = startDate.time
             date.add(Calendar.DAY_OF_YEAR, i)
 
-            days.add(Day(date))
-
-            if (weeks.size == 0 || weeks[weekPosition].days.size >= 7) {
-                weeks.add(Week(ArrayList()))
-                weekPosition++
-            }
-            weeks[weekPosition].days.add(Day(date))
+            val day = Day(date, false, false, daysPosition, weeks[daysPosition].days.size, i)
 
             if (date.time == currentDate.time) {
-                daysPagerPos = weekPosition
+                day.isToday = true
+                day.isSelected = true
+                daysPagerPos = daysPosition
                 agendaPagerPos = i
             }
+
+            days.add(day)
+            weeks[daysPosition].days.add(day)
         }
 
         initDaysPager()
@@ -104,9 +109,21 @@ class AgendaView : FrameLayout {
 
         daysPager.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        PagerSnapHelper().attachToRecyclerView(daysPager)
 
+        val pagerSnapHelper = object : PagerSnapHelper() {
+            override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
+                val position = super.findTargetSnapPosition(layoutManager, velocityX, velocityY)
+                if (daysPagerPos != position) changeDaysPosition(position)
+                return position
+            }
+        }
+        pagerSnapHelper.attachToRecyclerView(daysPager)
         daysPager.scrollToPosition(daysPagerPos)
+
+        adapter.observable.subscribe { day ->
+            agendaPager.smoothScrollToPosition(day.agendaPagerPos)
+            changeAgendaPosition(day.agendaPagerPos)
+        }
     }
 
     private fun initAgendaPager() {
@@ -115,9 +132,43 @@ class AgendaView : FrameLayout {
 
         agendaPager.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        PagerSnapHelper().attachToRecyclerView(agendaPager)
 
+        val pagerSnapHelper = object : PagerSnapHelper() {
+            override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
+                val position = super.findTargetSnapPosition(layoutManager, velocityX, velocityY)
+                if (position != agendaPagerPos) changeAgendaPosition(position)
+                return position
+            }
+        }
+        pagerSnapHelper.attachToRecyclerView(agendaPager)
         agendaPager.scrollToPosition(agendaPagerPos)
     }
 
+    private fun changeAgendaPosition(position: Int) {
+        (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = false
+        agendaPagerPos = position
+
+        val day = days[agendaPagerPos]
+        if (day.daysPagerPos != daysPagerPos) {
+            daysPagerPos = day.daysPagerPos
+            daysPager.smoothScrollToPosition(daysPagerPos)
+        }
+
+        (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true
+        daysPager.adapter.notifyDataSetChanged()
+    }
+
+    private fun changeDaysPosition(position: Int) {
+        (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = false
+        daysPagerPos = position
+
+        val day = weeks[daysPagerPos].days[days[agendaPagerPos].daysPos]
+        if (day.agendaPagerPos != agendaPagerPos) {
+            agendaPagerPos = day.agendaPagerPos
+            agendaPager.scrollToPosition(agendaPagerPos)
+        }
+
+        (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true
+        daysPager.adapter.notifyDataSetChanged()
+    }
 }

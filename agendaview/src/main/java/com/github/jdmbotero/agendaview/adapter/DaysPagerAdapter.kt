@@ -5,9 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.adapter.viewholder.DaysPagerViewHolder
+import com.github.jdmbotero.agendaview.model.Day
 import com.github.jdmbotero.agendaview.model.Week
+import io.reactivex.subjects.PublishSubject
 
 class DaysPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<DaysPagerViewHolder>() {
+
+    val observable = PublishSubject.create<Day>()!!
 
     var items: ArrayList<Week> = items
         set(items) {
@@ -24,7 +28,6 @@ class DaysPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<DaysPagerV
     }
 
     override fun onBindViewHolder(holder: DaysPagerViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], observable)
     }
-
 }

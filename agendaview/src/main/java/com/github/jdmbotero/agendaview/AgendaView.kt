@@ -160,14 +160,13 @@ class AgendaView : FrameLayout {
         startDate.set(Calendar.HOUR_OF_DAY, 0)
         startDate.set(Calendar.MINUTE, 0)
         startDate.set(Calendar.SECOND, 0)
-
-        initDays()
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
 
         isFinishInflater = true
+        initDays()
     }
 
     private fun initDays() {
@@ -188,8 +187,9 @@ class AgendaView : FrameLayout {
 
                 val day = Day(date, false, false, daysPosition, weeks[daysPosition].days.size, i)
 
-                if (DateManager.getFormatDate(date, "yyyy-MM-dd") ==
-                        DateManager.getFormatDate(currentDate, "yyyy-MM-dd")) {
+                if (date.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR) &&
+                        date.get(Calendar.MONTH) == currentDate.get(Calendar.MONTH) &&
+                        date.get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
                     day.isToday = true
                     day.isSelected = true
                     daysPagerPos = daysPosition
@@ -271,8 +271,6 @@ class AgendaView : FrameLayout {
             }
             pagerSnapHelper.attachToRecyclerView(agendaPager)
             agendaPager.scrollToPosition(agendaPagerPos)
-
-            onDayChangeListener?.invoke(days[agendaPagerPos])
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -309,6 +307,7 @@ class AgendaView : FrameLayout {
             if (day.agendaPagerPos != agendaPagerPos) {
                 agendaPagerPos = day.agendaPagerPos
                 agendaPager.scrollToPosition(agendaPagerPos)
+                onDayChangeListener?.invoke(days[agendaPagerPos])
             }
 
             (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true

@@ -40,8 +40,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addEvents() {
-        val rnd = Random()
-
         val currentDate = Calendar.getInstance()
         currentDate.set(Calendar.HOUR_OF_DAY, 0)
         currentDate.set(Calendar.MINUTE, 0)

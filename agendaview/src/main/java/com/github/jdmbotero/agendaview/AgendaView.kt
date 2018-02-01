@@ -2,6 +2,7 @@ package com.github.jdmbotero.agendaview
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Parcelable
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
@@ -149,6 +150,8 @@ class AgendaView : FrameLayout {
             newEventTextColor = typedArray.getInt(R.styleable.AgendaView_newEventTextColor,
                     ContextCompat.getColor(context, R.color.colorEventText))
 
+            allowNewEventPrevNow = typedArray.getBoolean(R.styleable.AgendaView_allowNewEventPrevNow, true)
+
             typedArray.recycle()
         }
 
@@ -166,6 +169,12 @@ class AgendaView : FrameLayout {
         super.onFinishInflate()
 
         isFinishInflater = true
+        initDays()
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+
         initDays()
     }
 

@@ -1,5 +1,6 @@
 package com.github.jdmbotero.agendaview.adapter.viewholder
 
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -74,7 +75,8 @@ class AgendaListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     textName.text = str
                 }
 
-                view.setBackgroundColor(event.color)
+                view.setBackgroundColor(Color.argb(90, Color.red(event.color), Color.green(event.color), Color.blue(event.color)))
+
                 textName.setTextColor(event.textColor)
                 textDescription.setTextColor(event.textColor)
             } catch (e: Exception) {

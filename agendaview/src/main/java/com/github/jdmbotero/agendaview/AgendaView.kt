@@ -90,6 +90,7 @@ class AgendaView : FrameLayout {
         var onHourClickListener: ((Calendar) -> Unit)? = null
         var onEventClickListener: ((Event) -> Unit)? = null
         var onNewEventClickListener: ((Event) -> Unit)? = null
+        var onDayChangeListener: ((Day) -> Unit)? = null
     }
 
     constructor(context: Context) : super(context) {
@@ -287,6 +288,8 @@ class AgendaView : FrameLayout {
 
             (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true
             daysPager.adapter.notifyItemChanged(daysPagerPos)
+
+            onDayChangeListener?.invoke(days[position])
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -343,6 +346,10 @@ class AgendaView : FrameLayout {
 
     fun setOnNewEventClickListener(listener: (Event) -> Unit) {
         onNewEventClickListener = listener
+    }
+
+    fun setOnDayChangeListener(listener: (Day) -> Unit) {
+        onDayChangeListener = listener
     }
 
     var setHourHeight

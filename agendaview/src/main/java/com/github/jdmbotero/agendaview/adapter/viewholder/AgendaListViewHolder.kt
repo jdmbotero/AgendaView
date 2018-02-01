@@ -8,10 +8,10 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.github.jdmbotero.agendaview.AgendaView
 import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.model.Event
 import java.util.*
-
 
 class AgendaListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
@@ -35,16 +35,16 @@ class AgendaListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                 }
 
                 val minutes = (event.startDate.timeInMillis - date.timeInMillis) / 60000
-                val topMargin = (view.context.resources.getDimension(R.dimen.agenda_view_hour_height) * minutes / 60).toInt()
+                val topMargin = (AgendaView.hourHeight * minutes / 60).toInt()
 
                 if (view.layoutParams is RecyclerView.LayoutParams) {
                     val params = view.layoutParams as RecyclerView.LayoutParams
-                    params.height = (view.context.resources.getDimension(R.dimen.agenda_view_hour_height) * event.timeInMinutes / 60).toInt()
+                    params.height = (AgendaView.hourHeight * event.timeInMinutes / 60).toInt()
                     params.setMargins(0, topMargin, 0, 0)
                     view.layoutParams = params
                 } else if (view.layoutParams is RelativeLayout.LayoutParams) {
                     val params = view.layoutParams as RelativeLayout.LayoutParams
-                    params.height = (view.context.resources.getDimension(R.dimen.agenda_view_hour_height) * event.timeInMinutes / 60).toInt()
+                    params.height = (AgendaView.hourHeight * event.timeInMinutes / 60).toInt()
                     params.setMargins(0, topMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics).toInt(), 0, 0)
                     view.layoutParams = params
                 }
@@ -54,28 +54,32 @@ class AgendaListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         }
 
         fun setUpEventStyle(view: View, event: Event) {
-            val contentEvent: LinearLayout = view.findViewById(R.id.contentEvent)
-            val textName: TextView = view.findViewById(R.id.textName)
-            val textDescription: TextView = view.findViewById(R.id.textDescription)
+            try {
+                val contentEvent: LinearLayout = view.findViewById(R.id.contentEvent)
+                val textName: TextView = view.findViewById(R.id.textName)
+                val textDescription: TextView = view.findViewById(R.id.textDescription)
 
-            contentEvent.gravity = event.textGravity
-            textName.gravity = event.textGravity
-            textDescription.gravity = event.textGravity
+                contentEvent.gravity = event.textGravity
+                textName.gravity = event.textGravity
+                textDescription.gravity = event.textGravity
 
-            if (event.timeInMinutes > 40) {
-                val str = SpannableStringBuilder(event.name)
-                str.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, event.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textName.text = str
-                textDescription.text = event.description
-            } else {
-                val str = SpannableStringBuilder(view.resources.getString(R.string.agenda_view_event_text, event.name, event.description))
-                str.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, event.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textName.text = str
+                if (event.timeInMinutes > 40) {
+                    val str = SpannableStringBuilder(event.name)
+                    str.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, event.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    textName.text = str
+                    textDescription.text = event.description
+                } else {
+                    val str = SpannableStringBuilder(view.resources.getString(R.string.agenda_view_event_text, event.name, event.description))
+                    str.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, event.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    textName.text = str
+                }
+
+                view.setBackgroundColor(event.color)
+                textName.setTextColor(event.textColor)
+                textDescription.setTextColor(event.textColor)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-
-            view.setBackgroundColor(event.color)
-            textName.setTextColor(event.textColor)
-            textDescription.setTextColor(event.textColor)
         }
     }
 }

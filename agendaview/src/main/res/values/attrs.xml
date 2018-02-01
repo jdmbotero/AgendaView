@@ -3,6 +3,20 @@
     <declare-styleable name="AgendaView">
         <attr name="firstDay" format="integer" />
         <attr name="numberOfDays" format="integer" />
+
+        <attr name="hourHeight" format="dimension" />
+        <attr name="backgroundColor" format="color" />
+
+        <attr name="dayTextColor" format="color" />
+        <attr name="dayCurrentColor" format="color" />
+        <attr name="dayCurrentTextColor" format="color" />
+
+        <attr name="hourTextColor" format="color" />
+        <attr name="hourCurrentColor" format="color" />
+
+        <attr name="dayBackground" format="reference" />
+        <attr name="daySelectedBackground" format="reference" />
+
         <attr name="showNewEventInClick" format="boolean" />
         <attr name="newEventTimeInMinutes" format="integer" />
         <attr name="newEventColor" format="color" />

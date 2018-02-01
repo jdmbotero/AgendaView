@@ -9,4 +9,8 @@
 
     <color name="colorTextPrimary">#ececec</color>
     <color name="colorTextGray">#707275</color>
+
+    <color name="colorEvent">#474a4f</color>
+    <color name="colorEventText">@color/colorTextPrimary</color>
+
 </resources>

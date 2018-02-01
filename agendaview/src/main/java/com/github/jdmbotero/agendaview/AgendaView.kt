@@ -1,7 +1,8 @@
 package com.github.jdmbotero.agendaview
 
 import android.content.Context
-import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
@@ -66,10 +67,28 @@ class AgendaView : FrameLayout {
         }
 
     companion object {
+        var hourHeight: Float = 0f
+
+        var backgroundColor: Int = 0
+
+        var dayTextColor: Int = 0
+        var dayCurrentColor: Int = 0
+        var dayCurrentTextColor: Int = 0
+
+        var hourTextColor: Int = 0
+        var hourCurrentColor: Int = 0
+
+        var dayBackground: Drawable? = null
+        var daySelectedBackground: Drawable? = null
+
         var showNewEventInClick: Boolean = true
         var newEventTimeInMinutes: Int = 60
-        var newEventColor: Int = Color.parseColor("#474a4f")
-        var newEventTextColor: Int = Color.parseColor("#ececec")
+        var newEventColor: Int = 0
+        var newEventTextColor: Int = 0
+
+        var onHourClickListener: ((Calendar) -> Unit)? = null
+        var onEventClickListener: ((Event) -> Unit)? = null
+        var onNewEventClickListener: ((Event) -> Unit)? = null
     }
 
     constructor(context: Context) : super(context) {
@@ -91,15 +110,47 @@ class AgendaView : FrameLayout {
             firstDay = typedArray.getInt(R.styleable.AgendaView_firstDay, Calendar.SUNDAY)
             numberOfDays = typedArray.getInt(R.styleable.AgendaView_numberOfDays, 364)
 
+            hourHeight = typedArray.getDimension(R.styleable.AgendaView_hourHeight,
+                    context.resources.getDimension(R.dimen.agenda_view_hour_height))
+
+            backgroundColor = typedArray.getInt(R.styleable.AgendaView_backgroundColor,
+                    ContextCompat.getColor(context, R.color.colorBackground))
+
+            dayTextColor = typedArray.getInt(R.styleable.AgendaView_dayTextColor,
+                    ContextCompat.getColor(context, R.color.colorTextPrimary))
+
+            dayCurrentTextColor = typedArray.getInt(R.styleable.AgendaView_dayCurrentTextColor,
+                    ContextCompat.getColor(context, R.color.colorTextGray))
+            dayCurrentColor = typedArray.getInt(R.styleable.AgendaView_dayCurrentColor,
+                    ContextCompat.getColor(context, R.color.colorAccent))
+
+            hourTextColor = typedArray.getInt(R.styleable.AgendaView_hourTextColor,
+                    ContextCompat.getColor(context, R.color.colorTextPrimary))
+            hourCurrentColor = typedArray.getInt(R.styleable.AgendaView_hourCurrentColor,
+                    ContextCompat.getColor(context, R.color.colorAccent))
+
+            dayBackground = typedArray.getDrawable(R.styleable.AgendaView_dayBackground)
+            if (dayBackground == null)
+                dayBackground = ContextCompat.getDrawable(context, R.drawable.agenda_view_bg_day)
+
+            daySelectedBackground = typedArray.getDrawable(R.styleable.AgendaView_daySelectedBackground)
+            if (daySelectedBackground == null)
+                daySelectedBackground = ContextCompat.getDrawable(context, R.drawable.agenda_view_bg_day_selected)
+
+
             showNewEventInClick = typedArray.getBoolean(R.styleable.AgendaView_showNewEventInClick, true)
             newEventTimeInMinutes = typedArray.getInt(R.styleable.AgendaView_newEventTimeInMinutes, 60)
-            newEventColor = typedArray.getInt(R.styleable.AgendaView_newEventColor, Color.parseColor("#474a4f"))
-            newEventTextColor = typedArray.getInt(R.styleable.AgendaView_newEventTextColor, Color.parseColor("#ececec"))
+
+            newEventColor = typedArray.getInt(R.styleable.AgendaView_newEventColor,
+                    ContextCompat.getColor(context, R.color.colorEvent))
+            newEventTextColor = typedArray.getInt(R.styleable.AgendaView_newEventTextColor,
+                    ContextCompat.getColor(context, R.color.colorEventText))
 
             typedArray.recycle()
         }
 
         LayoutInflater.from(context).inflate(R.layout.view_agenda, this, true)
+        this.setBackgroundColor(backgroundColor)
 
         startDate.add(Calendar.DAY_OF_YEAR, -7)
         startDate.set(Calendar.DAY_OF_WEEK, firstDay)
@@ -113,20 +164,6 @@ class AgendaView : FrameLayout {
 
         isFinishInflater = true
         initDays()
-    }
-
-    fun addNewEvent(event: Event) {
-        events.add(event)
-        Collections.sort(events) { o1, o2 -> o1.startDate.compareTo(o2.startDate) }
-
-        val day = days.single { day ->
-            day.date.get(Calendar.YEAR) == event.startDate.get(Calendar.YEAR)
-                    && day.date.get(Calendar.MONTH) == event.startDate.get(Calendar.MONTH)
-                    && day.date.get(Calendar.DAY_OF_MONTH) == event.startDate.get(Calendar.DAY_OF_MONTH)
-        }
-
-        setUpEventsToDay(day)
-        agendaPager.adapter.notifyItemChanged(day.agendaPagerPos)
     }
 
     private fun initDays() {
@@ -169,6 +206,7 @@ class AgendaView : FrameLayout {
     }
 
     private fun setUpAllEvents() {
+        Collections.sort(events) { o1, o2 -> o1.startDate.compareTo(o2.startDate) }
         days.forEach { day ->
             setUpEventsToDay(day)
         }
@@ -229,10 +267,6 @@ class AgendaView : FrameLayout {
             }
             pagerSnapHelper.attachToRecyclerView(agendaPager)
             agendaPager.scrollToPosition(agendaPagerPos)
-
-            adapter.observable.subscribe { date ->
-
-            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -277,4 +311,36 @@ class AgendaView : FrameLayout {
     }
 
 
+    /**
+     * Public Methods
+     */
+
+    fun addEvent(event: Event) {
+        val day: Day? = days.singleOrNull { day ->
+            day.date.get(Calendar.YEAR) == event.startDate.get(Calendar.YEAR)
+                    && day.date.get(Calendar.MONTH) == event.startDate.get(Calendar.MONTH)
+                    && day.date.get(Calendar.DAY_OF_MONTH) == event.startDate.get(Calendar.DAY_OF_MONTH)
+        }
+
+        if (day != null) {
+            events.add(event)
+            day.events.add(event)
+            Collections.sort(day.events) { o1, o2 -> o1.startDate.compareTo(o2.startDate) }
+
+            (agendaPager.adapter as AgendaPagerAdapter).items[day.agendaPagerPos].events = day.events
+            agendaPager.adapter.notifyItemChanged(day.agendaPagerPos)
+        }
+    }
+
+    fun setOnHourClickListener(listener: (Calendar) -> Unit) {
+        onHourClickListener = listener
+    }
+
+    fun setOnEventClickListener(listener: (Event) -> Unit) {
+        onEventClickListener = listener
+    }
+
+    fun setOnNewEventClickListener(listener: (Event) -> Unit) {
+        onNewEventClickListener = listener
+    }
 }

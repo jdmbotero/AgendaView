@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.github.jdmbotero.agendaview.AgendaView
 import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.model.Day
 import com.github.jdmbotero.agendaview.model.Week
@@ -66,14 +67,14 @@ class DaysPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
             textView.gravity = Gravity.CENTER
 
-            if (day.isToday) textView.setTextColor(view.resources.getColor(R.color.colorAccent))
-            else textView.setTextColor(view.resources.getColor(R.color.colorTextPrimary))
+            if (day.isToday) textView.setTextColor(AgendaView.dayCurrentColor)
+            else textView.setTextColor(AgendaView.dayTextColor)
 
             if (!isName) {
                 if (day.isSelected)
-                    textView.background = view.resources.getDrawable(R.drawable.agenda_view_bg_day_selected)
+                    textView.background = AgendaView.daySelectedBackground
                 else
-                    textView.background = view.resources.getDrawable(R.drawable.agenda_view_bg_day)
+                    textView.background = AgendaView.dayBackground
             }
         } catch (e: Exception) {
             e.printStackTrace()

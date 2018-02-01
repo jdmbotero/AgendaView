@@ -9,8 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="5dp"
-        android:textColor="@color/colorTextGray" />
+        android:padding="5dp" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scrollView"
@@ -41,15 +40,27 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="1">
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/listEvents"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
                     <LinearLayout
                         android:id="@+id/contentLines"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/listEvents"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false" />
+
+                    <LinearLayout
+                        android:id="@+id/contentButtons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:orientation="vertical" />
 
                 </RelativeLayout>
@@ -94,15 +105,13 @@
                     android:layout_weight="0.2"
                     android:gravity="end"
                     android:text="00:00"
-                    android:textColor="@color/colorAccent"
                     android:textSize="13sp" />
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_marginStart="5dp"
-                    android:layout_weight="1"
-                    android:background="@color/colorAccent" />
+                    android:layout_weight="1" />
 
             </LinearLayout>
 

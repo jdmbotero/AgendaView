@@ -28,6 +28,6 @@ class AgendaPagerAdapter(items: ArrayList<Day>) : RecyclerView.Adapter<AgendaPag
     }
 
     override fun onBindViewHolder(holder: AgendaPagerViewHolder, position: Int) {
-        holder.bind(items[position], observable)
+        holder.bind(items[position])
     }
 }

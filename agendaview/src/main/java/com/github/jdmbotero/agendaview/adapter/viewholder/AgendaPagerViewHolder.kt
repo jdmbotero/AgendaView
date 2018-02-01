@@ -3,7 +3,6 @@ package com.github.jdmbotero.agendaview.adapter.viewholder
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -20,7 +19,6 @@ import com.github.jdmbotero.agendaview.model.Event
 import com.github.jdmbotero.agendaview.util.DateManager
 import com.github.jdmbotero.agendaview.util.Utils
 import com.jakewharton.rxbinding2.view.RxView
-import io.reactivex.subjects.PublishSubject
 import java.util.*
 
 class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
@@ -29,50 +27,68 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
     private var textCurrentDate: TextView = view.findViewById(R.id.textCurrentDate)
     private var contentHours: LinearLayout = view.findViewById(R.id.contentHours)
     private var contentLines: LinearLayout = view.findViewById(R.id.contentLines)
+    private var contentButtons: LinearLayout = view.findViewById(R.id.contentButtons)
     private var contentNewEvent: LinearLayout = view.findViewById(R.id.contentNewEvent)
     private var listEvents: RecyclerView = view.findViewById(R.id.listEvents)
 
     private var contentCurrentDate: LinearLayout = view.findViewById(R.id.contentCurrentDate)
 
-    fun bind(day: Day, observable: PublishSubject<Calendar>) {
+    fun bind(day: Day) {
         scrollView.scrollTo(0, 0)
         textCurrentDate.text = DateManager.getFormatDate(day.date)
+        textCurrentDate.setTextColor(AgendaView.dayCurrentTextColor)
+        contentNewEvent.visibility = View.GONE
 
-        initHours(day, observable)
+        initHours(day)
         initRecyclerView(day)
         initCurrentView(day)
     }
 
-    private fun initHours(day: Day, observable: PublishSubject<Calendar>) {
+    private fun initHours(day: Day) {
         try {
             contentHours.removeAllViews()
+            contentButtons.removeAllViews()
             contentLines.removeAllViews()
             for (i in 0..24) {
                 val textHour = getTextViewHour(i, String.format("%02d", if (i == 24) 0 else i) + ":00")
                 contentHours.addView(textHour)
+                contentLines.addView(getLine())
 
-                val buttonHour = getButtonHour()
-                if (i == 24) {
-                    buttonHour.layoutParams.height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, view.resources.displayMetrics).toInt()
-                } else {
+                if (i < 24) {
+                    val buttonHour = getButtonHour()
+                    contentButtons.addView(buttonHour)
+
                     RxView.touches(buttonHour).subscribe { motionEvent ->
                         if (motionEvent.action == MotionEvent.ACTION_UP) {
                             val hours = i
-                            val minutes = (motionEvent.y / view.context.resources.getDimension(R.dimen.agenda_view_hour_height)) * 60
+                            var minutes = (motionEvent.y / AgendaView.hourHeight) * 60
+
+                            when (minutes) {
+                                in 0..8 -> minutes = 0f
+                                in 8..23 -> minutes = 15f
+                                in 23..38 -> minutes = 30f
+                                in 38..53 -> minutes = 45f
+                                in 53..60 -> minutes = 60f
+                            }
 
                             val date = Calendar.getInstance()
                             date.time = day.date.time
-
                             date.set(Calendar.HOUR_OF_DAY, hours)
                             date.set(Calendar.MINUTE, minutes.toInt())
 
-                            if (AgendaView.showNewEventInClick) addNewEvent(day, date)
-                            observable.onNext(date)
+                            val events = day.events.filter { event ->
+                                (date == event.startDate) || (date == event.endDate) || (date in event.startDate..event.endDate)
+                            }
+
+                            if (events.isEmpty()) {
+                                if (AgendaView.showNewEventInClick) addNewEvent(day, date)
+                                AgendaView.onHourClickListener?.invoke(date)
+                            } else {
+                                AgendaView.onEventClickListener?.invoke(events.first())
+                            }
                         }
                     }
                 }
-
-                contentLines.addView(buttonHour)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -83,14 +99,14 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         val textView = TextView(view.context)
 
         try {
-            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    view.context.resources.getDimension(R.dimen.agenda_view_hour_height).toInt())
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, AgendaView.hourHeight.toInt())
             textView.layoutParams = params
 
             textView.text = text
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 13f, view.resources.displayMetrics))
             textView.gravity = Gravity.END
+            textView.setTextColor(AgendaView.hourTextColor)
 
             val date = Calendar.getInstance()
             date.set(Calendar.HOUR_OF_DAY, hour)
@@ -113,14 +129,27 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         return textView
     }
 
+    private fun getLine(): View {
+        val view = View(view.context)
+
+        try {
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, AgendaView.hourHeight.toInt())
+            view.layoutParams = params
+
+            view.background = view.resources.getDrawable(R.drawable.agenda_view_bg_button_hour)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return view
+    }
+
     private fun getButtonHour(): View {
         val view = View(view.context)
 
         try {
-            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, view.context.resources.getDimension(R.dimen.agenda_view_hour_height).toInt())
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, AgendaView.hourHeight.toInt())
             view.layoutParams = params
-
-            view.background = view.resources.getDrawable(R.drawable.agenda_view_bg_button_hour)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -155,13 +184,16 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                 date.set(Calendar.SECOND, 0)
 
                 val minutes = (currentDate.timeInMillis - date.timeInMillis) / 60000
-                val topMargin = (view.context.resources.getDimension(R.dimen.agenda_view_hour_height) * minutes / 60).toInt()
+                val topMargin = (AgendaView.hourHeight * minutes / 60).toInt()
 
                 val params = contentCurrentDate.layoutParams as RelativeLayout.LayoutParams
                 params.setMargins(0, topMargin, 0, 0)
                 contentCurrentDate.layoutParams = params
 
                 (contentCurrentDate.getChildAt(0) as TextView).text = DateManager.getFormatDate(currentDate, "HH:mm")
+                (contentCurrentDate.getChildAt(0) as TextView).setTextColor(AgendaView.hourCurrentColor)
+                contentCurrentDate.getChildAt(1).setBackgroundColor(AgendaView.hourCurrentColor)
+
                 contentCurrentDate.visibility = View.VISIBLE
 
                 val screenSize = Utils.getScreenSize(view.context)
@@ -176,39 +208,42 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
     private fun addNewEvent(day: Day, date: Calendar) {
         try {
-            var minutes = 0
-            when (date.get(Calendar.MINUTE)) {
-                in 0..8 -> minutes = 0
-                in 8..23 -> minutes = 15
-                in 23..38 -> minutes = 30
-                in 38..53 -> minutes = 45
-                in 53..60 -> minutes = 60
-            }
-            date.set(Calendar.MINUTE, minutes)
-
             val newEvent = Event(
                     "New Event", "", date,
                     AgendaView.newEventTimeInMinutes,
                     AgendaView.newEventColor,
                     AgendaView.newEventTextColor)
 
-            val events = day.events.filter { event ->
-                (newEvent.startDate == event.startDate) ||
-                        (newEvent.endDate == event.endDate) ||
-                        (event.startDate in newEvent.startDate..newEvent.endDate) ||
-                        (event.endDate in newEvent.startDate..newEvent.endDate) ||
-                        (newEvent.startDate in event.startDate..event.endDate) ||
-                        (newEvent.endDate in event.startDate..event.endDate)
-            }
+            val dayEndDate = Calendar.getInstance()
+            dayEndDate.time = day.date.time
+            dayEndDate.set(Calendar.HOUR_OF_DAY, 24)
+            dayEndDate.set(Calendar.MINUTE, 0)
+            dayEndDate.set(Calendar.SECOND, 0)
 
-            if (events.isEmpty()) {
-                AgendaListViewHolder.setUpEventView(contentNewEvent, newEvent, null)
-                AgendaListViewHolder.setUpEventStyle(contentNewEvent.getChildAt(1), newEvent)
-                (contentNewEvent.getChildAt(0) as TextView).text = if (minutes in 15..45) ":" + minutes.toString() else ""
-                contentNewEvent.visibility = View.VISIBLE
+            if (newEvent.endDate <= dayEndDate) {
+                val events = day.events.filter { event ->
 
-                RxView.clicks(contentNewEvent).subscribe {
-                    Log.e("Create event", "Create event")
+                    (newEvent.startDate == event.startDate) ||
+                            (newEvent.endDate == event.endDate) ||
+                            (event.startDate in newEvent.startDateRange..newEvent.endDateRange) ||
+                            (event.endDate in newEvent.startDateRange..newEvent.endDateRange) ||
+                            (newEvent.startDate in event.startDateRange..event.endDateRange) ||
+                            (newEvent.endDate in event.startDateRange..event.endDateRange)
+                }
+
+                if (events.isEmpty()) {
+                    AgendaListViewHolder.setUpEventView(contentNewEvent, newEvent, null)
+                    AgendaListViewHolder.setUpEventStyle(contentNewEvent.getChildAt(1), newEvent)
+                    (contentNewEvent.getChildAt(0) as TextView).text =
+                            if (newEvent.startDate.get(Calendar.MINUTE) in 15..45) ":" + newEvent.startDate.get(Calendar.MINUTE).toString() else ""
+
+                    contentNewEvent.visibility = View.VISIBLE
+
+                    RxView.clicks(contentNewEvent).subscribe {
+                        AgendaView.onNewEventClickListener?.invoke(newEvent)
+                    }
+                } else {
+                    contentNewEvent.visibility = View.GONE
                 }
             } else {
                 contentNewEvent.visibility = View.GONE

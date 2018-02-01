@@ -20,24 +20,44 @@ class Event {
         this.textColor = textColor
 
         calculateEndDate()
+        calculateRangeDate()
     }
 
     var name: String = ""
     var description: String = ""
     var startDate: Calendar
+        set(value) {
+            field = value
+            calculateEndDate()
+            calculateRangeDate()
+        }
     var timeInMinutes: Int = 0
         set(value) {
             field = value
             calculateEndDate()
+            calculateRangeDate()
         }
     var color: Int = Color.parseColor("#474a4f")
     var textColor: Int = Color.parseColor("#ececec")
-    var textGravity: Int = Gravity.LEFT
+    var textGravity: Int = Gravity.START
 
     lateinit var endDate: Calendar
+    lateinit var startDateRange: Calendar
+    lateinit var endDateRange: Calendar
+
     private fun calculateEndDate() {
         endDate = Calendar.getInstance()
         endDate.time = startDate.time
         endDate.add(Calendar.MINUTE, timeInMinutes)
+    }
+
+    private fun calculateRangeDate() {
+        startDateRange = Calendar.getInstance()
+        startDateRange.time = startDate.time
+        startDateRange.add(Calendar.MINUTE, 1)
+
+        endDateRange = Calendar.getInstance()
+        endDateRange.time = endDate.time
+        endDateRange.add(Calendar.MINUTE, -1)
     }
 }

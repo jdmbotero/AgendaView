@@ -172,12 +172,6 @@ class AgendaView : FrameLayout {
         initDays()
     }
 
-    override fun onRestoreInstanceState(state: Parcelable?) {
-        super.onRestoreInstanceState(state)
-
-        initDays()
-    }
-
     private fun initDays() {
         try {
             days.clear()
@@ -238,11 +232,12 @@ class AgendaView : FrameLayout {
 
     private fun initDaysPager() {
         try {
-            val adapter = DaysPagerAdapter(weeks)
-            daysPager.adapter = adapter
-
+            daysPager.setHasFixedSize(true)
             daysPager.layoutManager =
                     LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+            val adapter = DaysPagerAdapter(weeks)
+            daysPager.adapter = adapter
 
             val pagerSnapHelper = object : PagerSnapHelper() {
                 override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
@@ -255,7 +250,7 @@ class AgendaView : FrameLayout {
             daysPager.scrollToPosition(daysPagerPos)
 
             adapter.observable.subscribe { day ->
-                agendaPager.smoothScrollToPosition(day.agendaPagerPos)
+                agendaPager.scrollToPosition(day.agendaPagerPos)
                 changeAgendaPosition(day.agendaPagerPos)
             }
         } catch (e: Exception) {
@@ -265,11 +260,12 @@ class AgendaView : FrameLayout {
 
     private fun initAgendaPager() {
         try {
-            val adapter = AgendaPagerAdapter(days)
-            agendaPager.adapter = adapter
-
+            agendaPager.setHasFixedSize(true)
             agendaPager.layoutManager =
                     LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+            val adapter = AgendaPagerAdapter(days)
+            agendaPager.adapter = adapter
 
             val pagerSnapHelper = object : PagerSnapHelper() {
                 override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
@@ -377,18 +373,22 @@ class AgendaView : FrameLayout {
     }
 
     fun showDate(date: Calendar) {
-        val day: Day? = days.singleOrNull { day ->
-            day.date.get(Calendar.YEAR) == date.get(Calendar.YEAR)
-                    && day.date.get(Calendar.MONTH) == date.get(Calendar.MONTH)
-                    && day.date.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH)
-        }
+        try {
+            val day: Day? = days.singleOrNull { day ->
+                day.date.get(Calendar.YEAR) == date.get(Calendar.YEAR)
+                        && day.date.get(Calendar.MONTH) == date.get(Calendar.MONTH)
+                        && day.date.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH)
+            }
 
-        if (day != null) {
-            agendaPagerPos = day.agendaPagerPos
-            agendaPager.scrollToPosition(agendaPagerPos)
+            if (day != null) {
+                agendaPagerPos = day.agendaPagerPos
+                agendaPager.scrollToPosition(agendaPagerPos)
 
-            (agendaPager.findViewHolderForAdapterPosition(agendaPagerPos) as AgendaPagerViewHolder)
-                    .showHour(date.get(Calendar.HOUR_OF_DAY))
+                (agendaPager.findViewHolderForAdapterPosition(agendaPagerPos) as AgendaPagerViewHolder)
+                        .showHour(date.get(Calendar.HOUR_OF_DAY))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

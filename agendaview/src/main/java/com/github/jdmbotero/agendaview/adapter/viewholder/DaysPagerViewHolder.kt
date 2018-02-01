@@ -21,7 +21,7 @@ class DaysPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         (view as LinearLayout).removeAllViews()
         week.days.forEach { day ->
             val viewDay = getDay(day)
-            RxView.clicks(viewDay).subscribe {
+            viewDay.setOnClickListener {
                 observable.onNext(day)
             }
             (view as LinearLayout).addView(viewDay)

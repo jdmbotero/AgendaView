@@ -81,7 +81,13 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                             }
 
                             if (events.isEmpty()) {
-                                if (AgendaView.showNewEventInClick) addNewEvent(day, date)
+                                if (AgendaView.showNewEventInClick) {
+                                    if (AgendaView.allowNewEventPrevNow) addNewEvent(day, date)
+                                    else {
+                                        val currentDate = Calendar.getInstance()
+                                        if (date >= currentDate) addNewEvent(day, date)
+                                    }
+                                }
                                 AgendaView.onHourClickListener?.invoke(date)
                             } else {
                                 AgendaView.onEventClickListener?.invoke(events.first())

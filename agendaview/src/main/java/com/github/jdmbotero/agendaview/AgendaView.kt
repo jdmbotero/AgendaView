@@ -85,6 +85,7 @@ class AgendaView : FrameLayout {
         var newEventTimeInMinutes: Int = 60
         var newEventColor: Int = 0
         var newEventTextColor: Int = 0
+        var allowNewEventPrevNow: Boolean = true
 
         var onHourClickListener: ((Calendar) -> Unit)? = null
         var onEventClickListener: ((Event) -> Unit)? = null
@@ -343,4 +344,88 @@ class AgendaView : FrameLayout {
     fun setOnNewEventClickListener(listener: (Event) -> Unit) {
         onNewEventClickListener = listener
     }
+
+    var setHourHeight
+        set(value) {
+            hourHeight = value
+        }
+        get() = hourHeight
+
+    var setBackgroundColor
+        set(value) {
+            backgroundColor = value
+        }
+        get() = backgroundColor
+
+    var setDayTextColor
+        set(value) {
+            dayTextColor = value
+        }
+        get() = dayTextColor
+
+    var setDayCurrentColor
+        set(value) {
+            dayCurrentColor = value
+        }
+        get() = dayCurrentColor
+
+    var setDayCurrentTextColor
+        set(value) {
+            dayCurrentTextColor = value
+        }
+        get() = dayCurrentTextColor
+
+    var setHourTextColor
+        set(value) {
+            hourTextColor = value
+        }
+        get() = hourTextColor
+
+    var setHourCurrentColor
+        set(value) {
+            hourCurrentColor = value
+        }
+        get() = hourCurrentColor
+
+    var setDayBackground
+        set(value) {
+            dayBackground = value
+        }
+        get() = dayBackground
+
+    var setDaySelectedBackground
+        set(value) {
+            daySelectedBackground = value
+        }
+        get() = daySelectedBackground
+
+    var setShowNewEventInClick
+        set(value) {
+            showNewEventInClick = value
+        }
+        get() = showNewEventInClick
+
+    var setNewEventTimeInMinutes
+        set(value) {
+            newEventTimeInMinutes = value
+        }
+        get() = newEventTimeInMinutes
+
+    var setNewEventColor
+        set(value) {
+            newEventColor = value
+        }
+        get() = newEventColor
+
+    var setNewEventTextColor
+        set(value) {
+            newEventTextColor = value
+        }
+        get() = newEventTextColor
+
+    var setAllowNewEventPrevNow
+        set(value) {
+            allowNewEventPrevNow = value
+        }
+        get() = allowNewEventPrevNow
 }

@@ -44,6 +44,7 @@ You can set this properties from xml code
 | `newEventTimeInMinutes` | ---         |
 | `newEventColor`         | ---         |
 | `newEventTextColor`     | ---         |
+| `allowNewEventPrevNow`  | ---         |
 
 
 

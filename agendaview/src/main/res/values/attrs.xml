@@ -21,5 +21,7 @@
         <attr name="newEventTimeInMinutes" format="integer" />
         <attr name="newEventColor" format="color" />
         <attr name="newEventTextColor" format="color" />
+
+        <attr name="allowNewEventPrevNow" format="boolean" />
     </declare-styleable>
 </resources>

@@ -3,6 +3,7 @@ package com.github.jdmbotero.sample
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import com.github.jdmbotero.agendaview.AgendaView
 import com.github.jdmbotero.agendaview.model.Event
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*

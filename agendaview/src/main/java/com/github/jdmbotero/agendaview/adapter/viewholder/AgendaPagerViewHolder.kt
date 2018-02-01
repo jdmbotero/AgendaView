@@ -50,7 +50,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
             contentButtons.removeAllViews()
             contentLines.removeAllViews()
             for (i in 0..24) {
-                val textHour = getTextViewHour(i, String.format("%02d", if (i == 24) 0 else i) + ":00")
+                val textHour = getTextViewHour(day, i, String.format("%02d", if (i == 24) 0 else i) + ":00")
                 contentHours.addView(textHour)
                 contentLines.addView(getLine())
 
@@ -101,7 +101,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    private fun getTextViewHour(hour: Int, text: String): TextView {
+    private fun getTextViewHour(day: Day, hour: Int, text: String): TextView {
         val textView = TextView(view.context)
 
         try {
@@ -124,7 +124,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
             val endDate = Calendar.getInstance()
             endDate.add(Calendar.MINUTE, 10)
 
-            if (date in startDate..endDate) {
+            if (day.isToday && date in startDate..endDate) {
                 textView.visibility = View.INVISIBLE
             }
 
@@ -257,5 +257,9 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun showHour(hour: Int) {
+        ViewPropertyObjectAnimator.animate(scrollView).scrollY((hour * AgendaView.hourHeight).toInt()).start()
     }
 }

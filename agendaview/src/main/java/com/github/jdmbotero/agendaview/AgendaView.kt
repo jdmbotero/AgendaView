@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.github.jdmbotero.agendaview.adapter.AgendaPagerAdapter
 import com.github.jdmbotero.agendaview.adapter.DaysPagerAdapter
+import com.github.jdmbotero.agendaview.adapter.viewholder.AgendaPagerViewHolder
 import com.github.jdmbotero.agendaview.model.Day
 import com.github.jdmbotero.agendaview.model.Event
 import com.github.jdmbotero.agendaview.model.Week
@@ -269,6 +270,8 @@ class AgendaView : FrameLayout {
             }
             pagerSnapHelper.attachToRecyclerView(agendaPager)
             agendaPager.scrollToPosition(agendaPagerPos)
+
+            onDayChangeListener?.invoke(days[agendaPagerPos])
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -289,7 +292,7 @@ class AgendaView : FrameLayout {
             (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true
             daysPager.adapter.notifyItemChanged(daysPagerPos)
 
-            onDayChangeListener?.invoke(days[position])
+            onDayChangeListener?.invoke(days[agendaPagerPos])
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -319,20 +322,32 @@ class AgendaView : FrameLayout {
      * Public Methods
      */
 
-    fun addEvent(event: Event) {
+    fun addEvent(newEvent: Event) {
         val day: Day? = days.singleOrNull { day ->
-            day.date.get(Calendar.YEAR) == event.startDate.get(Calendar.YEAR)
-                    && day.date.get(Calendar.MONTH) == event.startDate.get(Calendar.MONTH)
-                    && day.date.get(Calendar.DAY_OF_MONTH) == event.startDate.get(Calendar.DAY_OF_MONTH)
+            day.date.get(Calendar.YEAR) == newEvent.startDate.get(Calendar.YEAR)
+                    && day.date.get(Calendar.MONTH) == newEvent.startDate.get(Calendar.MONTH)
+                    && day.date.get(Calendar.DAY_OF_MONTH) == newEvent.startDate.get(Calendar.DAY_OF_MONTH)
         }
 
-        if (day != null) {
-            events.add(event)
-            day.events.add(event)
-            Collections.sort(day.events) { o1, o2 -> o1.startDate.compareTo(o2.startDate) }
 
-            (agendaPager.adapter as AgendaPagerAdapter).items[day.agendaPagerPos].events = day.events
-            agendaPager.adapter.notifyItemChanged(day.agendaPagerPos)
+        if (day != null) {
+            val eventsFound = day.events.filter { event ->
+                (newEvent.startDate == event.startDate) ||
+                        (newEvent.endDate == event.endDate) ||
+                        (event.startDate in newEvent.startDateRange..newEvent.endDateRange) ||
+                        (event.endDate in newEvent.startDateRange..newEvent.endDateRange) ||
+                        (newEvent.startDate in event.startDateRange..event.endDateRange) ||
+                        (newEvent.endDate in event.startDateRange..event.endDateRange)
+            }
+
+            if (eventsFound.isEmpty()) {
+                events.add(newEvent)
+                day.events.add(newEvent)
+                Collections.sort(day.events) { o1, o2 -> o1.startDate.compareTo(o2.startDate) }
+
+                (agendaPager.adapter as AgendaPagerAdapter).items[day.agendaPagerPos].events = day.events
+                agendaPager.adapter.notifyItemChanged(day.agendaPagerPos)
+            }
         }
     }
 
@@ -350,6 +365,22 @@ class AgendaView : FrameLayout {
 
     fun setOnDayChangeListener(listener: (Day) -> Unit) {
         onDayChangeListener = listener
+    }
+
+    fun showDate(date: Calendar) {
+        val day: Day? = days.singleOrNull { day ->
+            day.date.get(Calendar.YEAR) == date.get(Calendar.YEAR)
+                    && day.date.get(Calendar.MONTH) == date.get(Calendar.MONTH)
+                    && day.date.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH)
+        }
+
+        if (day != null) {
+            agendaPagerPos = day.agendaPagerPos
+            agendaPager.scrollToPosition(agendaPagerPos)
+
+            (agendaPager.findViewHolderForAdapterPosition(agendaPagerPos) as AgendaPagerViewHolder)
+                    .showHour(date.get(Calendar.HOUR_OF_DAY))
+        }
     }
 
     var setHourHeight

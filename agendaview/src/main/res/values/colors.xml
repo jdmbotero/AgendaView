@@ -13,4 +13,6 @@
     <color name="colorEvent">#474a4f</color>
     <color name="colorEventText">@color/colorTextPrimary</color>
 
+    <color name="colorHourLine">#474849</color>
+
 </resources>

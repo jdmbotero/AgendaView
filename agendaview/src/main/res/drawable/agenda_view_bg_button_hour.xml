@@ -7,7 +7,7 @@
         <shape android:shape="rectangle">
             <stroke
                 android:width="0.5dp"
-                android:color="@color/colorBackgroundGray" />
+                android:color="@color/colorHourLine" />
             <solid android:color="@android:color/transparent" />
         </shape>
     </item>

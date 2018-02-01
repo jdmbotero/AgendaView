@@ -5,6 +5,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.util.TypedValue
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.github.jdmbotero.agendaview.R
@@ -53,8 +54,13 @@ class AgendaListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         }
 
         fun setUpEventStyle(view: View, event: Event) {
+            val contentEvent: LinearLayout = view.findViewById(R.id.contentEvent)
             val textName: TextView = view.findViewById(R.id.textName)
             val textDescription: TextView = view.findViewById(R.id.textDescription)
+
+            contentEvent.gravity = event.textGravity
+            textName.gravity = event.textGravity
+            textDescription.gravity = event.textGravity
 
             if (event.timeInMinutes > 40) {
                 val str = SpannableStringBuilder(event.name)

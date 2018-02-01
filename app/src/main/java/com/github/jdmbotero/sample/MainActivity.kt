@@ -2,6 +2,7 @@ package com.github.jdmbotero.sample
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Gravity
 import com.github.jdmbotero.agendaview.model.Event
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
@@ -25,16 +26,22 @@ class MainActivity : AppCompatActivity() {
 
         val events = ArrayList<Event>()
 
-        for (i in 0..10) {
+        for (i in 0..100) {
             val startDate = Calendar.getInstance()
             startDate.time = currentDate.time
-            startDate.add(Calendar.HOUR_OF_DAY, i)
+            startDate.add(Calendar.HOUR_OF_DAY, i * 2)
 
-            events.add(Event(
+            val event = Event(
                     "Lorem ipsum ",
                     "lorem ipsum dolor sit amet",
                     startDate,
-                    rnd.nextInt(30) + 30))
+                    rnd.nextInt(90) + 30)
+
+            if (i == 0) {
+                event.textGravity = Gravity.CENTER
+            }
+
+            events.add(event)
         }
 
         agendaView.events = events

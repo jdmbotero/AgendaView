@@ -103,7 +103,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
             endDate.add(Calendar.MINUTE, 10)
 
             if (date in startDate..endDate) {
-                textView.visibility = View.GONE
+                textView.visibility = View.INVISIBLE
             }
 
         } catch (e: Exception) {
@@ -193,7 +193,12 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     AgendaView.newEventTextColor)
 
             val events = day.events.filter { event ->
-                (newEvent.startDate in event.startDate..event.endDate) || (newEvent.endDate in event.startDate..event.endDate)
+                (newEvent.startDate == event.startDate) ||
+                        (newEvent.endDate == event.endDate) ||
+                        (event.startDate in newEvent.startDate..newEvent.endDate) ||
+                        (event.endDate in newEvent.startDate..newEvent.endDate) ||
+                        (newEvent.startDate in event.startDate..event.endDate) ||
+                        (newEvent.endDate in event.startDate..event.endDate)
             }
 
             if (events.isEmpty()) {

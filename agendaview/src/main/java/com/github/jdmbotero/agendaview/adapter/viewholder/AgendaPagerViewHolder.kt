@@ -77,7 +77,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                             date.set(Calendar.MINUTE, minutes.toInt())
 
                             val events = day.events.filter { event ->
-                                (date == event.startDate) || (date == event.endDate) || (date in event.startDate..event.endDate)
+                                (date == event.startDate) || (date == event.endDate) || (date in event.startDateRange..event.endDateRange)
                             }
 
                             if (events.isEmpty()) {
@@ -228,7 +228,6 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
             if (newEvent.endDate <= dayEndDate) {
                 val events = day.events.filter { event ->
-
                     (newEvent.startDate == event.startDate) ||
                             (newEvent.endDate == event.endDate) ||
                             (event.startDate in newEvent.startDateRange..newEvent.endDateRange) ||

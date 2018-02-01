@@ -160,13 +160,14 @@ class AgendaView : FrameLayout {
         startDate.set(Calendar.HOUR_OF_DAY, 0)
         startDate.set(Calendar.MINUTE, 0)
         startDate.set(Calendar.SECOND, 0)
+
+        initDays()
     }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
 
         isFinishInflater = true
-        initDays()
     }
 
     private fun initDays() {

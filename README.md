@@ -2,6 +2,8 @@
 
 This library that allows you to generate a calendar with each day, time, entry and consultation of events.
 
+[![](https://jitpack.io/v/jdmbotero/AgendaView.svg)](https://jitpack.io/#jdmbotero/AgendaView)
+
 Usage
 ===============================
 

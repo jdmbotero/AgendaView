@@ -180,17 +180,6 @@ class AgendaView : FrameLayout {
         initDays()
     }
 
-    override fun onDetachedFromWindow() {
-        try {
-            weekPager.removeAllViews()
-            dayPager.removeAllViews()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        super.onDetachedFromWindow()
-    }
-
     inner class RecyclerViewDisabler : RecyclerView.OnItemTouchListener {
         override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
             return true

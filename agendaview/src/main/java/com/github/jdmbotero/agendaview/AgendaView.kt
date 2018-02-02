@@ -8,6 +8,7 @@ import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import com.github.jdmbotero.agendaview.adapter.DayPagerAdapter
 import com.github.jdmbotero.agendaview.adapter.WeekPagerAdapter
@@ -19,9 +20,13 @@ import com.github.jdmbotero.agendaview.util.DateManager
 import kotlinx.android.synthetic.main.view_agenda.view.*
 import java.util.*
 import kotlin.collections.ArrayList
+import android.view.MotionEvent
+import com.github.jdmbotero.agendaview.AgendaView.RecyclerViewDisabler
+
 
 class AgendaView : FrameLayout {
 
+    private val recyclerViewDisabler = RecyclerViewDisabler()
     private var isFinishInflater: Boolean = false
 
     private var days = ArrayList<Day>()
@@ -175,14 +180,35 @@ class AgendaView : FrameLayout {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+
+        isFinishInflater = true
+        initDays()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        isFinishInflater = true
-        initDays()
+        try {
+            weekPager.adapter.notifyDataSetChanged()
+            dayPager.adapter.notifyDataSetChanged()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
+
+
+    inner class RecyclerViewDisabler : RecyclerView.OnItemTouchListener {
+        override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+            return true
+        }
+
+        override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+        }
+
+        override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+        }
+    }
+
 
     private fun initDays() {
         try {
@@ -215,8 +241,8 @@ class AgendaView : FrameLayout {
                 weeks[weekPagerPos].days.add(day)
             }
 
-            initDaysPager()
-            initAgendaPager()
+            initWeekPager()
+            initDayPager()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -238,7 +264,7 @@ class AgendaView : FrameLayout {
         })
     }
 
-    private fun initDaysPager() {
+    private fun initWeekPager() {
         try {
             weekPager.setHasFixedSize(true)
             weekPager.layoutManager =
@@ -257,6 +283,15 @@ class AgendaView : FrameLayout {
             pagerSnapHelper.attachToRecyclerView(weekPager)
             weekPager.scrollToPosition(weekPagerPos)
 
+            weekPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                    when (newState) {
+                        RecyclerView.SCROLL_STATE_DRAGGING -> dayPager.addOnItemTouchListener(recyclerViewDisabler)
+                        else -> dayPager.removeOnItemTouchListener(recyclerViewDisabler)
+                    }
+                }
+            })
+
             adapter.observable.subscribe { day ->
                 dayPager.scrollToPosition(day.dayPagerPos)
                 changeAgendaPosition(day.dayPagerPos)
@@ -266,7 +301,7 @@ class AgendaView : FrameLayout {
         }
     }
 
-    private fun initAgendaPager() {
+    private fun initDayPager() {
         try {
             dayPager.setHasFixedSize(true)
             dayPager.layoutManager =
@@ -278,12 +313,22 @@ class AgendaView : FrameLayout {
             val pagerSnapHelper = object : PagerSnapHelper() {
                 override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
                     val position = super.findTargetSnapPosition(layoutManager, velocityX, velocityY)
-                    if (position != dayPagerPos) changeAgendaPosition(position)
+                    if (dayPagerPos != position) changeAgendaPosition(position)
                     return position
                 }
             }
             pagerSnapHelper.attachToRecyclerView(dayPager)
             dayPager.scrollToPosition(dayPagerPos)
+
+            dayPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                    when (newState) {
+                        RecyclerView.SCROLL_STATE_DRAGGING -> weekPager.addOnItemTouchListener(recyclerViewDisabler)
+                        else -> weekPager.removeOnItemTouchListener(recyclerViewDisabler)
+                    }
+                }
+            })
+
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -22,7 +22,7 @@ class DayListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
     }
 
     companion object {
-        fun setUpEventView(view: View, event: Event, prevEvent: Event?) {
+        fun setUpEventView(view: View, event: Event, prevEvent: Event?): Int? {
             try {
                 val date = Calendar.getInstance()
                 if (prevEvent != null) {
@@ -49,8 +49,11 @@ class DayListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     params.setMargins(0, topMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics).toInt(), 0, 0)
                     view.layoutParams = params
                 }
+
+                return topMargin
             } catch (e: Exception) {
                 e.printStackTrace()
+                return null
             }
         }
 

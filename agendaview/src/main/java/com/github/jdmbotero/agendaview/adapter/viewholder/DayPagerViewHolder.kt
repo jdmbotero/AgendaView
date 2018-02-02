@@ -45,7 +45,7 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
         if (AgendaView.showNewEvent && AgendaView.newEvent != null
                 && DateManager.isSameDay(AgendaView.newEvent!!.startDate, day.date)) {
-            addNewEvent(day, AgendaView.newEvent!!)
+            addNewEvent(day, AgendaView.newEvent!!, true)
         }
     }
 
@@ -214,7 +214,7 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    private fun addNewEvent(day: Day, date: Calendar) {
+    private fun addNewEvent(day: Day, date: Calendar, goToEvent: Boolean = false) {
         try {
             val newEvent = Event(
                     AgendaView.newEventText!!, "", date,
@@ -222,13 +222,13 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     AgendaView.newEventColor,
                     AgendaView.newEventTextColor)
 
-            addNewEvent(day, newEvent)
+            addNewEvent(day, newEvent, goToEvent)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun addNewEvent(day: Day, newEvent: Event) {
+    private fun addNewEvent(day: Day, newEvent: Event, goToEvent: Boolean = false) {
         try {
             val dayEndDate = Calendar.getInstance()
             dayEndDate.time = day.date.time
@@ -249,7 +249,9 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                 if (events.isEmpty()) {
                     AgendaView.newEvent = newEvent
 
-                    DayListViewHolder.setUpEventView(contentNewEvent, newEvent, null)
+                    var topMargin = DayListViewHolder.setUpEventView(contentNewEvent, newEvent, null)
+                    if (topMargin == null) topMargin = 0
+
                     DayListViewHolder.setUpEventStyle(contentNewEvent.getChildAt(1), newEvent)
                     (contentNewEvent.getChildAt(0) as TextView).text =
                             if (newEvent.startDate.get(Calendar.MINUTE) in 15..45) ":" + newEvent.startDate.get(Calendar.MINUTE).toString() else ""
@@ -258,6 +260,11 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
                     RxView.clicks(contentNewEvent).subscribe {
                         AgendaView.onNewEventClickListener?.invoke(newEvent)
+                    }
+
+                    if (goToEvent) {
+                        val screenSize = Utils.getScreenSize(view.context)
+                        ViewPropertyObjectAnimator.animate(scrollView).scrollY(if (topMargin >= (screenSize[1] * 0.3)) (topMargin - (screenSize[1] * 0.3)).toInt() else 0).start()
                     }
                 } else {
                     contentNewEvent.visibility = View.GONE

@@ -20,6 +20,7 @@
         <attr name="showNewEventInClick" format="boolean" />
         <attr name="newEventTimeInMinutes" format="integer" />
         <attr name="newEventColor" format="color" />
+        <attr name="newEventText" format="string" />
         <attr name="newEventTextColor" format="color" />
 
         <attr name="allowNewEventPrevNow" format="boolean" />

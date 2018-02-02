@@ -212,7 +212,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
     private fun addNewEvent(day: Day, date: Calendar) {
         try {
             val newEvent = Event(
-                    "New Event", "", date,
+                    AgendaView.newEventText!!, "", date,
                     AgendaView.newEventTimeInMinutes,
                     AgendaView.newEventColor,
                     AgendaView.newEventTextColor)

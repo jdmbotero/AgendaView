@@ -1,3 +1,4 @@
 <resources>
     <string name="agenda_view_event_text">%1$s %2$s</string>
+    <string name="agenda_view_new_event_text">New Event</string>
 </resources>

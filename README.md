@@ -1,8 +1,8 @@
 # AgendaView
 
-This library that allows you to generate a calendar with each day, time, entry and consultation of events.
-
 [![](https://jitpack.io/v/jdmbotero/AgendaView.svg)](https://jitpack.io/#jdmbotero/AgendaView)
+
+This library that allows you to generate a calendar with each day, time, entry and consultation of events.
 
 Usage
 ===============================
@@ -45,6 +45,7 @@ You can set this properties from xml code
 | `showNewEventInClick`   | ---         |
 | `newEventTimeInMinutes` | ---         |
 | `newEventColor`         | ---         |
+| `newEventText`          | ---         |
 | `newEventTextColor`     | ---         |
 | `allowNewEventPrevNow`  | ---         |
 

@@ -86,6 +86,7 @@ class AgendaView : FrameLayout {
         var showNewEventInClick: Boolean = true
         var newEventTimeInMinutes: Int = 60
         var newEventColor: Int = 0
+        var newEventText: String? = "New Event"
         var newEventTextColor: Int = 0
         var allowNewEventPrevNow: Boolean = true
 
@@ -147,6 +148,11 @@ class AgendaView : FrameLayout {
 
             newEventColor = typedArray.getInt(R.styleable.AgendaView_newEventColor,
                     ContextCompat.getColor(context, R.color.colorEvent))
+
+            newEventText = typedArray.getString(R.styleable.AgendaView_newEventText)
+            if (newEventText == null)
+                newEventText = context.resources.getString(R.string.agenda_view_new_event_text)
+
             newEventTextColor = typedArray.getInt(R.styleable.AgendaView_newEventTextColor,
                     ContextCompat.getColor(context, R.color.colorEventText))
 
@@ -167,6 +173,10 @@ class AgendaView : FrameLayout {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
 
         isFinishInflater = true
         initDays()
@@ -463,6 +473,12 @@ class AgendaView : FrameLayout {
             newEventColor = value
         }
         get() = newEventColor
+
+    var setNewEventText
+        set(value) {
+            newEventText = value
+        }
+        get() = newEventText
 
     var setNewEventTextColor
         set(value) {

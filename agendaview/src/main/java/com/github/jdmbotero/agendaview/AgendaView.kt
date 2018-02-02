@@ -175,7 +175,6 @@ class AgendaView : FrameLayout {
         Log.e("AgendaView", "init")
         Log.e("weekPagerPos", weekPagerPos.toString())
         Log.e("dayPagerPos", dayPagerPos.toString())
-        Log.e("weekDayPos", days[dayPagerPos].weekDayPos.toString())
     }
 
     override fun onFinishInflate() {

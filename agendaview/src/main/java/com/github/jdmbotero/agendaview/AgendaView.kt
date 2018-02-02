@@ -2,7 +2,6 @@ package com.github.jdmbotero.agendaview
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Parcelable
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
@@ -10,9 +9,9 @@ import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.github.jdmbotero.agendaview.adapter.AgendaPagerAdapter
-import com.github.jdmbotero.agendaview.adapter.DaysPagerAdapter
-import com.github.jdmbotero.agendaview.adapter.viewholder.AgendaPagerViewHolder
+import com.github.jdmbotero.agendaview.adapter.DayPagerAdapter
+import com.github.jdmbotero.agendaview.adapter.WeekPagerAdapter
+import com.github.jdmbotero.agendaview.adapter.viewholder.DayPagerViewHolder
 import com.github.jdmbotero.agendaview.model.Day
 import com.github.jdmbotero.agendaview.model.Event
 import com.github.jdmbotero.agendaview.model.Week
@@ -28,8 +27,8 @@ class AgendaView : FrameLayout {
     private var days = ArrayList<Day>()
     private var weeks = ArrayList<Week>()
 
-    private var daysPagerPos: Int = 0
-    private var agendaPagerPos: Int = 0
+    var weekPagerPos: Int = 0
+    var dayPagerPos: Int = 0
 
     var currentDate: Calendar = Calendar.getInstance()
 
@@ -82,6 +81,9 @@ class AgendaView : FrameLayout {
 
         var dayBackground: Drawable? = null
         var daySelectedBackground: Drawable? = null
+
+        var newEvent: Event? = null
+        var showNewEvent: Boolean = false
 
         var showNewEventInClick: Boolean = true
         var newEventTimeInMinutes: Int = 60
@@ -186,33 +188,31 @@ class AgendaView : FrameLayout {
         try {
             days.clear()
             weeks.clear()
-            var daysPosition = -1
+            var weekPagerPos = -1
 
             for (i in 0..numberOfDays) {
-                if (weeks.size == 0 || weeks[daysPosition].days.size >= 7) {
+                if (weeks.size == 0 || weeks[weekPagerPos].days.size >= 7) {
                     weeks.add(Week(ArrayList()))
-                    daysPosition++
+                    weekPagerPos++
                 }
 
                 val date = Calendar.getInstance()
                 date.time = startDate.time
                 date.add(Calendar.DAY_OF_YEAR, i)
 
-                val day = Day(date, false, false, daysPosition, weeks[daysPosition].days.size, i)
+                val day = Day(date, false, false, weekPagerPos, weeks[weekPagerPos].days.size, i)
 
-                if (date.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR) &&
-                        date.get(Calendar.MONTH) == currentDate.get(Calendar.MONTH) &&
-                        date.get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
+                if (DateManager.isSameDay(date, currentDate)) {
                     day.isToday = true
                     day.isSelected = true
-                    daysPagerPos = daysPosition
-                    agendaPagerPos = i
+                    this.weekPagerPos = weekPagerPos
+                    this.dayPagerPos = i
                 }
 
                 setUpEventsToDay(day)
 
                 days.add(day)
-                weeks[daysPosition].days.add(day)
+                weeks[weekPagerPos].days.add(day)
             }
 
             initDaysPager()
@@ -228,40 +228,38 @@ class AgendaView : FrameLayout {
             setUpEventsToDay(day)
         }
 
-        (agendaPager.adapter as AgendaPagerAdapter).items = days
+        (dayPager.adapter as DayPagerAdapter).items = days
     }
 
     private fun setUpEventsToDay(day: Day) {
         day.events.clear()
         day.events.addAll(events.filter { event ->
-            day.date.get(Calendar.YEAR) == event.startDate.get(Calendar.YEAR)
-                    && day.date.get(Calendar.MONTH) == event.startDate.get(Calendar.MONTH)
-                    && day.date.get(Calendar.DAY_OF_MONTH) == event.startDate.get(Calendar.DAY_OF_MONTH)
+            DateManager.isSameDay(day.date, event.startDate)
         })
     }
 
     private fun initDaysPager() {
         try {
-            daysPager.setHasFixedSize(true)
-            daysPager.layoutManager =
+            weekPager.setHasFixedSize(true)
+            weekPager.layoutManager =
                     LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-            val adapter = DaysPagerAdapter(weeks)
-            daysPager.adapter = adapter
+            val adapter = WeekPagerAdapter(weeks)
+            weekPager.adapter = adapter
 
             val pagerSnapHelper = object : PagerSnapHelper() {
                 override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
                     val position = super.findTargetSnapPosition(layoutManager, velocityX, velocityY)
-                    if (daysPagerPos != position) changeDaysPosition(position)
+                    if (weekPagerPos != position) changeDaysPosition(position)
                     return position
                 }
             }
-            pagerSnapHelper.attachToRecyclerView(daysPager)
-            daysPager.scrollToPosition(daysPagerPos)
+            pagerSnapHelper.attachToRecyclerView(weekPager)
+            weekPager.scrollToPosition(weekPagerPos)
 
             adapter.observable.subscribe { day ->
-                agendaPager.scrollToPosition(day.agendaPagerPos)
-                changeAgendaPosition(day.agendaPagerPos)
+                dayPager.scrollToPosition(day.dayPagerPos)
+                changeAgendaPosition(day.dayPagerPos)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -270,22 +268,22 @@ class AgendaView : FrameLayout {
 
     private fun initAgendaPager() {
         try {
-            agendaPager.setHasFixedSize(true)
-            agendaPager.layoutManager =
+            dayPager.setHasFixedSize(true)
+            dayPager.layoutManager =
                     LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-            val adapter = AgendaPagerAdapter(days)
-            agendaPager.adapter = adapter
+            val adapter = DayPagerAdapter(days)
+            dayPager.adapter = adapter
 
             val pagerSnapHelper = object : PagerSnapHelper() {
                 override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
                     val position = super.findTargetSnapPosition(layoutManager, velocityX, velocityY)
-                    if (position != agendaPagerPos) changeAgendaPosition(position)
+                    if (position != dayPagerPos) changeAgendaPosition(position)
                     return position
                 }
             }
-            pagerSnapHelper.attachToRecyclerView(agendaPager)
-            agendaPager.scrollToPosition(agendaPagerPos)
+            pagerSnapHelper.attachToRecyclerView(dayPager)
+            dayPager.scrollToPosition(dayPagerPos)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -293,20 +291,20 @@ class AgendaView : FrameLayout {
 
     private fun changeAgendaPosition(position: Int) {
         try {
-            (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = false
-            daysPager.adapter.notifyItemChanged(daysPagerPos)
-            agendaPagerPos = position
+            (weekPager.adapter as WeekPagerAdapter).items[weekPagerPos].days[days[dayPagerPos].weekDayPos].isSelected = false
+            weekPager.adapter.notifyItemChanged(weekPagerPos)
+            dayPagerPos = position
 
-            val day = days[agendaPagerPos]
-            if (day.daysPagerPos != daysPagerPos) {
-                daysPagerPos = day.daysPagerPos
-                daysPager.smoothScrollToPosition(daysPagerPos)
+            val day = days[dayPagerPos]
+            if (day.weekPagerPos != weekPagerPos) {
+                weekPagerPos = day.weekPagerPos
+                weekPager.smoothScrollToPosition(weekPagerPos)
             }
 
-            (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true
-            daysPager.adapter.notifyItemChanged(daysPagerPos)
+            (weekPager.adapter as WeekPagerAdapter).items[weekPagerPos].days[days[dayPagerPos].weekDayPos].isSelected = true
+            weekPager.adapter.notifyItemChanged(weekPagerPos)
 
-            onDayChangeListener?.invoke(days[agendaPagerPos])
+            onDayChangeListener?.invoke(days[dayPagerPos])
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -314,19 +312,19 @@ class AgendaView : FrameLayout {
 
     private fun changeDaysPosition(position: Int) {
         try {
-            (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = false
-            daysPager.adapter.notifyItemChanged(daysPagerPos)
-            daysPagerPos = position
+            (weekPager.adapter as WeekPagerAdapter).items[weekPagerPos].days[days[dayPagerPos].weekDayPos].isSelected = false
+            weekPager.adapter.notifyItemChanged(weekPagerPos)
+            weekPagerPos = position
 
-            val day = weeks[daysPagerPos].days[days[agendaPagerPos].daysPos]
-            if (day.agendaPagerPos != agendaPagerPos) {
-                agendaPagerPos = day.agendaPagerPos
-                agendaPager.scrollToPosition(agendaPagerPos)
-                onDayChangeListener?.invoke(days[agendaPagerPos])
+            val day = weeks[weekPagerPos].days[days[dayPagerPos].weekDayPos]
+            if (day.dayPagerPos != dayPagerPos) {
+                dayPagerPos = day.dayPagerPos
+                dayPager.scrollToPosition(dayPagerPos)
+                onDayChangeListener?.invoke(days[dayPagerPos])
             }
 
-            (daysPager.adapter as DaysPagerAdapter).items[daysPagerPos].days[days[agendaPagerPos].daysPos].isSelected = true
-            daysPager.adapter.notifyItemChanged(daysPagerPos)
+            (weekPager.adapter as WeekPagerAdapter).items[weekPagerPos].days[days[dayPagerPos].weekDayPos].isSelected = true
+            weekPager.adapter.notifyItemChanged(weekPagerPos)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -360,8 +358,8 @@ class AgendaView : FrameLayout {
                 day.events.add(newEvent)
                 Collections.sort(day.events) { o1, o2 -> o1.startDate.compareTo(o2.startDate) }
 
-                (agendaPager.adapter as AgendaPagerAdapter).items[day.agendaPagerPos].events = day.events
-                agendaPager.adapter.notifyItemChanged(day.agendaPagerPos)
+                (dayPager.adapter as DayPagerAdapter).items[day.dayPagerPos].events = day.events
+                dayPager.adapter.notifyItemChanged(day.dayPagerPos)
             }
         }
     }
@@ -391,10 +389,10 @@ class AgendaView : FrameLayout {
             }
 
             if (day != null) {
-                agendaPagerPos = day.agendaPagerPos
-                agendaPager.scrollToPosition(agendaPagerPos)
+                dayPagerPos = day.dayPagerPos
+                dayPager.scrollToPosition(dayPagerPos)
 
-                (agendaPager.findViewHolderForAdapterPosition(agendaPagerPos) as AgendaPagerViewHolder)
+                (dayPager.findViewHolderForAdapterPosition(dayPagerPos) as DayPagerViewHolder)
                         .showHour(date.get(Calendar.HOUR_OF_DAY))
             }
         } catch (e: Exception) {
@@ -455,6 +453,19 @@ class AgendaView : FrameLayout {
             daySelectedBackground = value
         }
         get() = daySelectedBackground
+
+    var setNewEvent
+        set(value) {
+            newEvent = value
+        }
+        get() = newEvent
+
+    var setShowNewEvent
+        set(value) {
+            showNewEvent = value
+        }
+        get() = showNewEvent
+
 
     var setShowNewEventInClick
         set(value) {

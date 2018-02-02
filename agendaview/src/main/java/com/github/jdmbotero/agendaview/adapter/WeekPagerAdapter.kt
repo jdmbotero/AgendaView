@@ -4,12 +4,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.github.jdmbotero.agendaview.R
-import com.github.jdmbotero.agendaview.adapter.viewholder.DaysPagerViewHolder
+import com.github.jdmbotero.agendaview.adapter.viewholder.WeekPagerViewHolder
 import com.github.jdmbotero.agendaview.model.Day
 import com.github.jdmbotero.agendaview.model.Week
 import io.reactivex.subjects.PublishSubject
 
-class DaysPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<DaysPagerViewHolder>() {
+class WeekPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<WeekPagerViewHolder>() {
 
     val observable = PublishSubject.create<Day>()!!
 
@@ -21,13 +21,13 @@ class DaysPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<DaysPagerV
 
     override fun getItemCount(): Int = items.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DaysPagerViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeekPagerViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.view_days_page, parent, false)
-        return DaysPagerViewHolder(view)
+                .inflate(R.layout.view_week_page, parent, false)
+        return WeekPagerViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: DaysPagerViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: WeekPagerViewHolder, position: Int) {
         holder.bind(items[position], observable)
     }
 }

@@ -7,8 +7,8 @@ data class Day(
         var date: Calendar,
         var isToday: Boolean = false,
         var isSelected: Boolean = false,
-        var daysPagerPos: Int = 0,
-        var daysPos: Int = 0,
-        var agendaPagerPos: Int = 0,
+        var weekPagerPos: Int = 0,
+        var weekDayPos: Int = 0,
+        var dayPagerPos: Int = 0,
         var events: kotlin.collections.ArrayList<Event> = ArrayList()
 )

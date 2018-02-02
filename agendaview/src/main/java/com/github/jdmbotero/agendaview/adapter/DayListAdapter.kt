@@ -4,10 +4,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.github.jdmbotero.agendaview.R
-import com.github.jdmbotero.agendaview.adapter.viewholder.AgendaListViewHolder
+import com.github.jdmbotero.agendaview.adapter.viewholder.DayListViewHolder
 import com.github.jdmbotero.agendaview.model.Event
 
-class AgendaListAdapter(items: ArrayList<Event>) : RecyclerView.Adapter<AgendaListViewHolder>() {
+class DayListAdapter(items: ArrayList<Event>) : RecyclerView.Adapter<DayListViewHolder>() {
 
     var items: ArrayList<Event> = items
         set(items) {
@@ -17,13 +17,13 @@ class AgendaListAdapter(items: ArrayList<Event>) : RecyclerView.Adapter<AgendaLi
 
     override fun getItemCount(): Int = items.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AgendaListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayListViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.view_agenda_list, parent, false)
-        return AgendaListViewHolder(view)
+                .inflate(R.layout.view_day_list, parent, false)
+        return DayListViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: AgendaListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DayListViewHolder, position: Int) {
         holder.bind(items[position], if (position > 0) items[position - 1] else null)
     }
 }

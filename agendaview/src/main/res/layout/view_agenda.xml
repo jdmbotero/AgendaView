@@ -5,12 +5,12 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/daysPager"
+        android:id="@+id/weekPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/agendaPager"
+        android:id="@+id/dayPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

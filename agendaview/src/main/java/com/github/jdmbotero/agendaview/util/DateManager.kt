@@ -40,4 +40,9 @@ object DateManager {
         val format = SimpleDateFormat(formatNeeded, Locale.US)
         return format.format(calendarDate.time)
     }
+
+    fun isSameDay(d1: Calendar, d2: Calendar): Boolean =
+            d1.get(Calendar.YEAR) == d2.get(Calendar.YEAR) &&
+                    d1.get(Calendar.MONTH) == d2.get(Calendar.MONTH) &&
+                    d1.get(Calendar.DAY_OF_MONTH) == d2.get(Calendar.DAY_OF_MONTH)
 }

@@ -15,7 +15,7 @@ import com.github.jdmbotero.agendaview.util.Utils
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.subjects.PublishSubject
 
-class DaysPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
+class WeekPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(week: Week, observable: PublishSubject<Day>) {
         (view as LinearLayout).removeAllViews()

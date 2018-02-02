@@ -14,7 +14,7 @@ import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.model.Event
 import java.util.*
 
-class AgendaListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
+class DayListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(event: Event, prevEvent: Event?) {
         setUpEventView(view, event, prevEvent)

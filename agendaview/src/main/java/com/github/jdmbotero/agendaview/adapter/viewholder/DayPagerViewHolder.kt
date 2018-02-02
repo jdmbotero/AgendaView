@@ -13,7 +13,7 @@ import android.widget.TextView
 import com.bartoszlipinski.viewpropertyobjectanimator.ViewPropertyObjectAnimator
 import com.github.jdmbotero.agendaview.AgendaView
 import com.github.jdmbotero.agendaview.R
-import com.github.jdmbotero.agendaview.adapter.AgendaListAdapter
+import com.github.jdmbotero.agendaview.adapter.DayListAdapter
 import com.github.jdmbotero.agendaview.model.Day
 import com.github.jdmbotero.agendaview.model.Event
 import com.github.jdmbotero.agendaview.util.DateManager
@@ -21,7 +21,7 @@ import com.github.jdmbotero.agendaview.util.Utils
 import com.jakewharton.rxbinding2.view.RxView
 import java.util.*
 
-class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
+class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
     private var scrollView: NestedScrollView = view.findViewById(R.id.scrollView)
     private var textCurrentDate: TextView = view.findViewById(R.id.textCurrentDate)
@@ -42,6 +42,11 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         initHours(day)
         initRecyclerView(day)
         initCurrentView(day)
+
+        if (AgendaView.showNewEvent && AgendaView.newEvent != null
+                && DateManager.isSameDay(AgendaView.newEvent!!.startDate, day.date)) {
+            addNewEvent(day, AgendaView.newEvent!!)
+        }
     }
 
     private fun initHours(day: Day) {
@@ -167,7 +172,7 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
             listEvents.setHasFixedSize(true)
             listEvents.layoutManager = LinearLayoutManager(view.context)
 
-            val adapter = AgendaListAdapter(day.events)
+            val adapter = DayListAdapter(day.events)
             listEvents.adapter = adapter
         } catch (e: Exception) {
             e.printStackTrace()
@@ -217,6 +222,14 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     AgendaView.newEventColor,
                     AgendaView.newEventTextColor)
 
+            addNewEvent(day, newEvent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun addNewEvent(day: Day, newEvent: Event) {
+        try {
             val dayEndDate = Calendar.getInstance()
             dayEndDate.time = day.date.time
             dayEndDate.set(Calendar.HOUR_OF_DAY, 24)
@@ -234,8 +247,10 @@ class AgendaPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                 }
 
                 if (events.isEmpty()) {
-                    AgendaListViewHolder.setUpEventView(contentNewEvent, newEvent, null)
-                    AgendaListViewHolder.setUpEventStyle(contentNewEvent.getChildAt(1), newEvent)
+                    AgendaView.newEvent = newEvent
+
+                    DayListViewHolder.setUpEventView(contentNewEvent, newEvent, null)
+                    DayListViewHolder.setUpEventStyle(contentNewEvent.getChildAt(1), newEvent)
                     (contentNewEvent.getChildAt(0) as TextView).text =
                             if (newEvent.startDate.get(Calendar.MINUTE) in 15..45) ":" + newEvent.startDate.get(Calendar.MINUTE).toString() else ""
 

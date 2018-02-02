@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.FrameLayout
@@ -166,14 +167,15 @@ class AgendaView : FrameLayout {
             typedArray.recycle()
         }
 
+        startDate = Calendar.getInstance()
+
         LayoutInflater.from(context).inflate(R.layout.view_agenda, this, true)
         this.setBackgroundColor(backgroundColor)
 
-        startDate.add(Calendar.DAY_OF_YEAR, -7)
-        startDate.set(Calendar.DAY_OF_WEEK, firstDay)
-        startDate.set(Calendar.HOUR_OF_DAY, 0)
-        startDate.set(Calendar.MINUTE, 0)
-        startDate.set(Calendar.SECOND, 0)
+        Log.e("AgendaView", "init")
+        Log.e("weekPagerPos", weekPagerPos.toString())
+        Log.e("dayPagerPos", dayPagerPos.toString())
+        Log.e("weekDayPos", days[dayPagerPos].weekDayPos.toString())
     }
 
     override fun onFinishInflate() {
@@ -181,6 +183,11 @@ class AgendaView : FrameLayout {
 
         isFinishInflater = true
         initDays()
+
+        Log.e("finish Inflate", "init")
+        Log.e("weekPagerPos", weekPagerPos.toString())
+        Log.e("dayPagerPos", dayPagerPos.toString())
+        Log.e("weekDayPos", days[dayPagerPos].weekDayPos.toString())
     }
 
     inner class RecyclerViewDisabler : RecyclerView.OnItemTouchListener {
@@ -241,7 +248,6 @@ class AgendaView : FrameLayout {
         }
 
         (dayPager.adapter as DayPagerAdapter).items = days
-        weekPager.adapter.notifyDataSetChanged()
     }
 
     private fun setUpEventsToDay(day: Day) {

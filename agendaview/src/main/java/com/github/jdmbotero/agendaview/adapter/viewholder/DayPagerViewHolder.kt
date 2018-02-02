@@ -82,7 +82,8 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                             date.set(Calendar.MINUTE, minutes.toInt())
 
                             val events = day.events.filter { event ->
-                                (date == event.startDate) || (date == event.endDate) || (date in event.startDateRange..event.endDateRange)
+                                (date == event.startDateRange) || (date == event.endDateRange) ||
+                                        (date in event.startDateRange..event.endDateRange)
                             }
 
                             if (events.isEmpty()) {

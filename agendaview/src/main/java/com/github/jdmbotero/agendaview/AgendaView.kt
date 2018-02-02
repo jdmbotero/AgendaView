@@ -171,10 +171,6 @@ class AgendaView : FrameLayout {
 
         LayoutInflater.from(context).inflate(R.layout.view_agenda, this, true)
         this.setBackgroundColor(backgroundColor)
-
-        Log.e("AgendaView", "init")
-        Log.e("weekPagerPos", weekPagerPos.toString())
-        Log.e("dayPagerPos", dayPagerPos.toString())
     }
 
     override fun onFinishInflate() {
@@ -182,11 +178,17 @@ class AgendaView : FrameLayout {
 
         isFinishInflater = true
         initDays()
+    }
 
-        Log.e("finish Inflate", "init")
-        Log.e("weekPagerPos", weekPagerPos.toString())
-        Log.e("dayPagerPos", dayPagerPos.toString())
-        Log.e("weekDayPos", days[dayPagerPos].weekDayPos.toString())
+    override fun onDetachedFromWindow() {
+        try {
+            weekPager.removeAllViews()
+            dayPager.removeAllViews()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        super.onDetachedFromWindow()
     }
 
     inner class RecyclerViewDisabler : RecyclerView.OnItemTouchListener {
@@ -320,7 +322,6 @@ class AgendaView : FrameLayout {
                     }
                 }
             })
-
         } catch (e: Exception) {
             e.printStackTrace()
         }

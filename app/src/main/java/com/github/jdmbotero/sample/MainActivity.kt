@@ -34,8 +34,6 @@ class MainActivity : AppCompatActivity() {
                 Color.parseColor("#6cbc05"),
                 Color.parseColor("#6cbc05"))
 
-
-
         agendaView.events = arrayListOf(event)
     }
 

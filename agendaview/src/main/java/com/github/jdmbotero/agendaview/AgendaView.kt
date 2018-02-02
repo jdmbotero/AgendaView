@@ -8,7 +8,7 @@ import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
+import android.view.MotionEvent
 import android.widget.FrameLayout
 import com.github.jdmbotero.agendaview.adapter.DayPagerAdapter
 import com.github.jdmbotero.agendaview.adapter.WeekPagerAdapter
@@ -20,8 +20,6 @@ import com.github.jdmbotero.agendaview.util.DateManager
 import kotlinx.android.synthetic.main.view_agenda.view.*
 import java.util.*
 import kotlin.collections.ArrayList
-import android.view.MotionEvent
-import com.github.jdmbotero.agendaview.AgendaView.RecyclerViewDisabler
 
 
 class AgendaView : FrameLayout {
@@ -185,18 +183,6 @@ class AgendaView : FrameLayout {
         initDays()
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        try {
-            weekPager.adapter.notifyDataSetChanged()
-            dayPager.adapter.notifyDataSetChanged()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-
     inner class RecyclerViewDisabler : RecyclerView.OnItemTouchListener {
         override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
             return true
@@ -255,6 +241,7 @@ class AgendaView : FrameLayout {
         }
 
         (dayPager.adapter as DayPagerAdapter).items = days
+        weekPager.adapter.notifyDataSetChanged()
     }
 
     private fun setUpEventsToDay(day: Day) {

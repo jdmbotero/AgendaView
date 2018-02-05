@@ -33,6 +33,7 @@ class DayListViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     date.set(Calendar.HOUR_OF_DAY, 0)
                     date.set(Calendar.MINUTE, 0)
                     date.set(Calendar.SECOND, 0)
+                    date.set(Calendar.MILLISECOND, 0)
                 }
 
                 val minutes = (event.startDate.timeInMillis - date.timeInMillis) / 60000

@@ -87,11 +87,11 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                             }
 
                             if (events.isEmpty()) {
+                                AgendaView.onHourClickListener?.invoke(date)
                                 if (AgendaView.showNewEventInClick) {
                                     if (AgendaView.allowNewEventPrevNow) addNewEvent(day, date)
                                     else if (date >= Calendar.getInstance()) addNewEvent(day, date)
                                 }
-                                AgendaView.onHourClickListener?.invoke(date)
                             } else {
                                 AgendaView.onEventClickListener?.invoke(events.first())
                             }

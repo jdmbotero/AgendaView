@@ -56,6 +56,9 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
             contentLines.removeAllViews()
             for (i in 0..24) {
                 val textHour = getTextViewHour(day, i, String.format("%02d", if (i == 24) 0 else i) + ":00")
+                if (i == 24) {
+                    textHour.layoutParams.height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, view.resources.displayMetrics).toInt()
+                }
                 contentHours.addView(textHour)
                 contentLines.addView(getLine())
 
@@ -187,12 +190,13 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     && day.date.get(Calendar.MONTH) == currentDate.get(Calendar.MONTH)
                     && day.date.get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
 
-                val date = Calendar.getInstance()
-                date.set(Calendar.HOUR_OF_DAY, 0)
-                date.set(Calendar.MINUTE, 0)
-                date.set(Calendar.SECOND, 0)
+                val initialDate = Calendar.getInstance()
+                initialDate.set(Calendar.HOUR_OF_DAY, 0)
+                initialDate.set(Calendar.MINUTE, 0)
+                initialDate.set(Calendar.SECOND, 0)
+                initialDate.set(Calendar.MILLISECOND, 0)
 
-                val minutes = (currentDate.timeInMillis - date.timeInMillis) / 60000
+                val minutes = (currentDate.timeInMillis - initialDate.timeInMillis) / 60000
                 val topMargin = (AgendaView.hourHeight * minutes / 60).toInt()
 
                 val params = contentCurrentDate.layoutParams as RelativeLayout.LayoutParams
@@ -236,6 +240,7 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
             dayEndDate.set(Calendar.HOUR_OF_DAY, 24)
             dayEndDate.set(Calendar.MINUTE, 0)
             dayEndDate.set(Calendar.SECOND, 0)
+            dayEndDate.set(Calendar.MILLISECOND, 0)
 
             if (newEvent.endDate <= dayEndDate) {
                 val events = day.events.filter { event ->
@@ -276,6 +281,12 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun getCurrentDateView() = contentCurrentDate
+
+    fun hideNewEventView() {
+        contentNewEvent.visibility = View.GONE
     }
 
     fun showHour(hour: Int) {

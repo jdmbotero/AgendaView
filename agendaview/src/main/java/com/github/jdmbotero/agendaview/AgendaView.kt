@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.FrameLayout
@@ -320,6 +319,8 @@ class AgendaView : FrameLayout {
         try {
             (weekPager.adapter as WeekPagerAdapter).items[weekPagerPos].days[days[dayPagerPos].weekDayPos].isSelected = false
             weekPager.adapter.notifyItemChanged(weekPagerPos)
+
+            hideNewEventView()
             dayPagerPos = position
 
             val day = days[dayPagerPos]
@@ -362,6 +363,32 @@ class AgendaView : FrameLayout {
      * Public Methods
      */
 
+    fun setOnHourClickListener(listener: (Calendar) -> Unit) {
+        onHourClickListener = listener
+    }
+
+    fun setOnEventClickListener(listener: (Event) -> Unit) {
+        onEventClickListener = listener
+    }
+
+    fun setOnNewEventClickListener(listener: (Event) -> Unit) {
+        onNewEventClickListener = listener
+    }
+
+    fun setOnDayChangeListener(listener: (Day) -> Unit) {
+        onDayChangeListener = listener
+    }
+
+
+    fun hideNewEventView() {
+        try {
+            val dayPagerViewHolder: DayPagerViewHolder? = (dayPager.findViewHolderForAdapterPosition(dayPagerPos) as DayPagerViewHolder)
+            dayPagerViewHolder?.hideNewEventView()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     fun addEvent(newEvent: Event) {
         val day: Day? = days.singleOrNull { day ->
             day.date.get(Calendar.YEAR) == newEvent.startDate.get(Calendar.YEAR)
@@ -391,22 +418,6 @@ class AgendaView : FrameLayout {
         }
     }
 
-    fun setOnHourClickListener(listener: (Calendar) -> Unit) {
-        onHourClickListener = listener
-    }
-
-    fun setOnEventClickListener(listener: (Event) -> Unit) {
-        onEventClickListener = listener
-    }
-
-    fun setOnNewEventClickListener(listener: (Event) -> Unit) {
-        onNewEventClickListener = listener
-    }
-
-    fun setOnDayChangeListener(listener: (Day) -> Unit) {
-        onDayChangeListener = listener
-    }
-
     fun showDate(date: Calendar) {
         try {
             val day: Day? = days.singleOrNull { day ->
@@ -419,13 +430,14 @@ class AgendaView : FrameLayout {
                 dayPagerPos = day.dayPagerPos
                 dayPager.scrollToPosition(dayPagerPos)
 
-                (dayPager.findViewHolderForAdapterPosition(dayPagerPos) as DayPagerViewHolder)
-                        .showHour(date.get(Calendar.HOUR_OF_DAY))
+                val dayPagerViewHolder: DayPagerViewHolder? = (dayPager.findViewHolderForAdapterPosition(dayPagerPos) as DayPagerViewHolder)
+                dayPagerViewHolder?.showHour(date.get(Calendar.HOUR_OF_DAY))
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
 
     var setHourHeight
         set(value) {

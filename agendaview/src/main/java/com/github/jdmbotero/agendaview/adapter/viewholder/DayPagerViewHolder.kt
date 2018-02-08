@@ -3,6 +3,7 @@ package com.github.jdmbotero.agendaview.adapter.viewholder
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -19,7 +20,11 @@ import com.github.jdmbotero.agendaview.model.Event
 import com.github.jdmbotero.agendaview.util.DateManager
 import com.github.jdmbotero.agendaview.util.Utils
 import com.jakewharton.rxbinding2.view.RxView
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
@@ -119,21 +124,6 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 13f, view.resources.displayMetrics))
             textView.gravity = Gravity.END
             textView.setTextColor(AgendaView.hourTextColor)
-
-            val date = Calendar.getInstance()
-            date.set(Calendar.HOUR_OF_DAY, hour)
-            date.set(Calendar.MINUTE, 0)
-
-            val startDate = Calendar.getInstance()
-            startDate.add(Calendar.MINUTE, -10)
-
-            val endDate = Calendar.getInstance()
-            endDate.add(Calendar.MINUTE, 10)
-
-            if (day.isToday && date in startDate..endDate) {
-                textView.visibility = View.INVISIBLE
-            }
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -190,24 +180,14 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     && day.date.get(Calendar.MONTH) == currentDate.get(Calendar.MONTH)
                     && day.date.get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)) {
 
-                val initialDate = Calendar.getInstance()
-                initialDate.set(Calendar.HOUR_OF_DAY, 0)
-                initialDate.set(Calendar.MINUTE, 0)
-                initialDate.set(Calendar.SECOND, 0)
-                initialDate.set(Calendar.MILLISECOND, 0)
+                val topMargin = calculateTopCurrentView()
 
-                val minutes = (currentDate.timeInMillis - initialDate.timeInMillis) / 60000
-                val topMargin = (AgendaView.hourHeight * minutes / 60).toInt()
-
-                val params = contentCurrentDate.layoutParams as RelativeLayout.LayoutParams
-                params.setMargins(0, topMargin, 0, 0)
-                contentCurrentDate.layoutParams = params
-
-                (contentCurrentDate.getChildAt(0) as TextView).text = DateManager.getFormatDate(currentDate, "HH:mm")
-                (contentCurrentDate.getChildAt(0) as TextView).setTextColor(AgendaView.hourCurrentColor)
-                contentCurrentDate.getChildAt(1).setBackgroundColor(AgendaView.hourCurrentColor)
-
-                contentCurrentDate.visibility = View.VISIBLE
+                Observable.interval(20, TimeUnit.SECONDS)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            calculateTopCurrentView()
+                        }
 
                 val screenSize = Utils.getScreenSize(view.context)
                 ViewPropertyObjectAnimator.animate(scrollView).scrollY(if (topMargin >= (screenSize[1] * 0.3)) (topMargin - (screenSize[1] * 0.3)).toInt() else 0).start()
@@ -217,6 +197,42 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun calculateTopCurrentView(): Int {
+        val currentDate = Calendar.getInstance()
+
+        val initialDate = Calendar.getInstance()
+        initialDate.set(Calendar.HOUR_OF_DAY, 0)
+        initialDate.set(Calendar.MINUTE, 0)
+        initialDate.set(Calendar.SECOND, 0)
+        initialDate.set(Calendar.MILLISECOND, 0)
+
+        val minutes = (currentDate.timeInMillis - initialDate.timeInMillis) / 60000
+        val topMargin = (AgendaView.hourHeight * minutes / 60).toInt()
+
+        val params = contentCurrentDate.layoutParams as RelativeLayout.LayoutParams
+        params.setMargins(0, topMargin, 0, 0)
+        contentCurrentDate.layoutParams = params
+
+        (contentCurrentDate.getChildAt(0) as TextView).text = DateManager.getFormatDate(currentDate, "HH:mm")
+        (contentCurrentDate.getChildAt(0) as TextView).setTextColor(AgendaView.hourCurrentColor)
+        contentCurrentDate.getChildAt(1).setBackgroundColor(AgendaView.hourCurrentColor)
+
+        contentCurrentDate.visibility = View.VISIBLE
+
+        for (i in 0 until contentHours.childCount) {
+            val top = contentHours.getChildAt(i).top - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics)
+            val bottom = contentHours.getChildAt(i).top + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics)
+
+            if (topMargin in top..bottom) {
+                contentHours.getChildAt(i).visibility = View.INVISIBLE
+            } else {
+                contentHours.getChildAt(i).visibility = View.VISIBLE
+            }
+        }
+
+        return topMargin
     }
 
     private fun addNewEvent(day: Day, date: Calendar, goToEvent: Boolean = false) {

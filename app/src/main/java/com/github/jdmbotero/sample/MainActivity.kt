@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
 
         addEvents()
         //addEvent()
+
+        agendaView.setDayPosition(-1)
     }
 
     private fun addEvent() {

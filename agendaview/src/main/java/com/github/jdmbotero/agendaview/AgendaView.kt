@@ -29,7 +29,7 @@ class AgendaView : FrameLayout {
     private var isFinishInflater: Boolean = false
 
     private var days = ArrayList<Day>()
-    var dayPosition: Int = -1
+    private var dayPosition: Int = -1
 
     var currentDate: Calendar = Calendar.getInstance()
 
@@ -264,7 +264,7 @@ class AgendaView : FrameLayout {
             pagerSnapHelper.attachToRecyclerView(weekPager)
             weekPager.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    weekPager.smoothScrollToPosition(dayPosition)
+                    if (dayPosition >= 0) weekPager.smoothScrollToPosition(dayPosition)
                     weekPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             })
@@ -307,7 +307,7 @@ class AgendaView : FrameLayout {
 
             dayPager.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    dayPager.scrollToPosition(dayPosition)
+                    if (dayPosition >= 0) dayPager.scrollToPosition(dayPosition)
                     dayPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             })
@@ -384,6 +384,11 @@ class AgendaView : FrameLayout {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun setDayPosition(position: Int) {
+        if (position != dayPosition)
+            changeDayPosition(position)
     }
 
     fun addEvent(newEvent: Event) {

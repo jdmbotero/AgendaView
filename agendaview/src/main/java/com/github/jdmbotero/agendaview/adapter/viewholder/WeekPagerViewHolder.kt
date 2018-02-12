@@ -9,77 +9,45 @@ import android.widget.TextView
 import com.github.jdmbotero.agendaview.AgendaView
 import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.model.Day
-import com.github.jdmbotero.agendaview.model.Week
 import com.github.jdmbotero.agendaview.util.DateManager
 import com.github.jdmbotero.agendaview.util.Utils
-import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.subjects.PublishSubject
 
 class WeekPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
 
-    fun bind(week: Week, observable: PublishSubject<Day>) {
-        (view as LinearLayout).removeAllViews()
-        week.days.forEach { day ->
-            val viewDay = getDay(day)
-            viewDay.setOnClickListener {
-                observable.onNext(day)
-            }
-            (view as LinearLayout).addView(viewDay)
-        }
-    }
+    fun bind(day: Day, observable: PublishSubject<Day>) {
+        val textDay = (view as LinearLayout).getChildAt(0) as TextView
+        val textName = (view as LinearLayout).getChildAt(1) as TextView
 
-    private fun getDay(day: Day): LinearLayout {
-        val linearLayout = LinearLayout(view.context)
+        val screenSize = Utils.getScreenSize(view.context)
 
-        try {
-            val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT)
-            params.weight = 1f
+        val params = LinearLayout.LayoutParams((screenSize[0] / 7) - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics).toInt(),
+                (screenSize[0] / 7) - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics).toInt())
+        textDay.layoutParams = params
+        textName.layoutParams = params
 
-            linearLayout.layoutParams = params
-            linearLayout.gravity = Gravity.CENTER
-            linearLayout.orientation = LinearLayout.VERTICAL
+        textDay.text = DateManager.getFormatDate(day.date, "dd")
+        textName.text = DateManager.getFormatDate(day.date, "EEE")
 
-            linearLayout.addView(getTextView(day, true))
-            linearLayout.addView(getTextView(day, false))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        textDay.setTextSize(TypedValue.COMPLEX_UNIT_PX, view.resources.getDimension(R.dimen.agenda_view_day_size))
+        textName.setTextSize(TypedValue.COMPLEX_UNIT_PX, view.resources.getDimension(R.dimen.agenda_view_day_name_size))
 
-        return linearLayout
-    }
+        textDay.gravity = Gravity.CENTER
+        textName.gravity = Gravity.CENTER
 
-    private fun getTextView(day: Day, isName: Boolean): TextView {
-        val textView = TextView(view.context)
-
-        try {
-            val screenSize = Utils.getScreenSize(view.context)
-
-            val params = LinearLayout.LayoutParams(screenSize[0] / 10, screenSize[0] / 10)
-            params.setMargins(0, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, -5f, view.resources.displayMetrics).toInt(), 0, 0)
-            textView.layoutParams = params
-
-            textView.text = if (isName) DateManager.getFormatDate(day.date, "EEE")
-            else DateManager.getFormatDate(day.date, "dd")
-
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    if (isName) view.resources.getDimension(R.dimen.agenda_view_day_name_size)
-                    else view.resources.getDimension(R.dimen.agenda_view_day_size))
-
-            textView.gravity = Gravity.CENTER
-
-            if (day.isToday) textView.setTextColor(AgendaView.dayCurrentColor)
-            else textView.setTextColor(AgendaView.dayTextColor)
-
-            if (!isName) {
-                if (day.isSelected)
-                    textView.background = AgendaView.daySelectedBackground
-                else
-                    textView.background = AgendaView.dayBackground
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        if (day.isToday) {
+            textDay.setTextColor(AgendaView.dayCurrentColor)
+            textName.setTextColor(AgendaView.dayCurrentColor)
+        } else {
+            textDay.setTextColor(AgendaView.dayTextColor)
+            textName.setTextColor(AgendaView.dayTextColor)
         }
 
-        return textView
+        if (day.isSelected) textDay.background = AgendaView.daySelectedBackground
+        else textDay.background = AgendaView.dayBackground
+
+        view.setOnClickListener {
+            observable.onNext(day)
+        }
     }
 }

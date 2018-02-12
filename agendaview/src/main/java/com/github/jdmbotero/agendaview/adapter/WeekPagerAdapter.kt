@@ -6,14 +6,13 @@ import android.view.ViewGroup
 import com.github.jdmbotero.agendaview.R
 import com.github.jdmbotero.agendaview.adapter.viewholder.WeekPagerViewHolder
 import com.github.jdmbotero.agendaview.model.Day
-import com.github.jdmbotero.agendaview.model.Week
 import io.reactivex.subjects.PublishSubject
 
-class WeekPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<WeekPagerViewHolder>() {
+class WeekPagerAdapter(items: ArrayList<Day>) : RecyclerView.Adapter<WeekPagerViewHolder>() {
 
     val observable = PublishSubject.create<Day>()!!
 
-    var items: ArrayList<Week> = items
+    var items: ArrayList<Day> = items
         set(items) {
             field = items
             notifyDataSetChanged()
@@ -23,7 +22,7 @@ class WeekPagerAdapter(items: ArrayList<Week>) : RecyclerView.Adapter<WeekPagerV
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeekPagerViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.view_week_page, parent, false)
+                .inflate(R.layout.view_week_day_page, parent, false)
         return WeekPagerViewHolder(view)
     }
 

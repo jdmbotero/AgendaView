@@ -3,7 +3,6 @@ package com.github.jdmbotero.agendaview.adapter.viewholder
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -124,6 +123,20 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 13f, view.resources.displayMetrics))
             textView.gravity = Gravity.END
             textView.setTextColor(AgendaView.hourTextColor)
+
+            val date = Calendar.getInstance()
+            date.set(Calendar.HOUR_OF_DAY, hour)
+            date.set(Calendar.MINUTE, 0)
+
+            val startDate = Calendar.getInstance()
+            startDate.add(Calendar.MINUTE, -10)
+
+            val endDate = Calendar.getInstance()
+            endDate.add(Calendar.MINUTE, 10)
+
+            if (day.isToday && date in startDate..endDate) {
+                textView.visibility = View.INVISIBLE
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

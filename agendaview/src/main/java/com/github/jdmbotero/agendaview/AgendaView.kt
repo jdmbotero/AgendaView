@@ -43,8 +43,11 @@ class AgendaView : FrameLayout {
 
     var startDate: Calendar = Calendar.getInstance()
         set(value) {
-            value.add(Calendar.DAY_OF_YEAR, -7)
             value.set(Calendar.DAY_OF_WEEK, firstDay)
+
+            if (value.timeInMillis > Calendar.getInstance().timeInMillis)
+                value.add(Calendar.DAY_OF_YEAR, -7)
+
             value.set(Calendar.HOUR_OF_DAY, 0)
             value.set(Calendar.MINUTE, 0)
             value.set(Calendar.SECOND, 0)

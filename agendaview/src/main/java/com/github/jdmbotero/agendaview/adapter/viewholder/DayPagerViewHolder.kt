@@ -294,7 +294,7 @@ class DayPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
                     contentNewEvent.visibility = View.VISIBLE
 
                     RxView.clicks(contentNewEvent).subscribe {
-                        AgendaView.onNewEventClickListener?.invoke(newEvent)
+                        AgendaView.onNewEventClickListener?.invoke(day.dayPosition, newEvent)
                     }
 
                     if (goToEvent) {

@@ -95,7 +95,7 @@ class AgendaView : FrameLayout {
 
         var onHourClickListener: ((Calendar) -> Unit)? = null
         var onEventClickListener: ((Event) -> Unit)? = null
-        var onNewEventClickListener: ((Event) -> Unit)? = null
+        var onNewEventClickListener: ((Int, Event) -> Unit)? = null
         var onDayChangeListener: ((Int, Day) -> Unit)? = null
     }
 
@@ -368,7 +368,7 @@ class AgendaView : FrameLayout {
         onEventClickListener = listener
     }
 
-    fun setOnNewEventClickListener(listener: (Event) -> Unit) {
+    fun setOnNewEventClickListener(listener: (Int, Event) -> Unit) {
         onNewEventClickListener = listener
     }
 

@@ -29,7 +29,7 @@ class AgendaView : FrameLayout {
     private var isFinishInflater: Boolean = false
 
     private var days = ArrayList<Day>()
-    var dayPosition: Int = 0
+    var dayPosition: Int = -1
 
     var currentDate: Calendar = Calendar.getInstance()
 
@@ -203,11 +203,13 @@ class AgendaView : FrameLayout {
 
                 if (DateManager.isSameDay(date, currentDate)) {
                     day.isToday = true
-                    if (dayPosition == 0) this.dayPosition = i
+                    if (dayPosition == -1) {
+                        this.dayPosition = i
+                    }
                 }
 
                 if (this.dayPosition == i) day.isSelected = true
-                
+
                 setUpEventsToDay(day)
                 days.add(day)
             }

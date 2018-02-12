@@ -387,8 +387,11 @@ class AgendaView : FrameLayout {
     }
 
     fun setDayPosition(position: Int) {
-        if (position != dayPosition)
+        if (position != dayPosition && position >= 0) {
+            weekPager.smoothScrollToPosition(position)
+            dayPager.scrollToPosition(position)
             changeDayPosition(position)
+        }
     }
 
     fun addEvent(newEvent: Event) {

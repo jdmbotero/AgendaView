@@ -390,7 +390,7 @@ class AgendaView : FrameLayout {
         if (position != dayPosition && position >= 0) {
             weekPager.smoothScrollToPosition(position)
             dayPager.scrollToPosition(position)
-            changeDayPosition(position)
+            changeWeekPosition(position)
         }
     }
 

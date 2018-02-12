@@ -259,7 +259,7 @@ class AgendaView : FrameLayout {
             })
 
             pagerSnapHelper.attachToRecyclerView(weekPager)
-            weekPager.scrollToPosition(0)
+            weekPager.smoothScrollToPosition(dayPosition)
 
             weekPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
@@ -296,7 +296,7 @@ class AgendaView : FrameLayout {
                 }
             }
             pagerSnapHelper.attachToRecyclerView(dayPager)
-            dayPager.scrollToPosition(dayPosition)
+            dayPager.smoothScrollToPosition(dayPosition)
 
             dayPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {

@@ -2,7 +2,6 @@ package com.github.jdmbotero.agendaview.adapter.viewholder
 
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -24,16 +23,9 @@ class WeekPagerViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         val params = LinearLayout.LayoutParams((screenSize[0] / 7) - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics).toInt(),
                 (screenSize[0] / 7) - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, view.resources.displayMetrics).toInt())
         textDay.layoutParams = params
-        textName.layoutParams = params
 
         textDay.text = DateManager.getFormatDate(day.date, "dd")
         textName.text = DateManager.getFormatDate(day.date, "EEE")
-
-        textDay.setTextSize(TypedValue.COMPLEX_UNIT_PX, view.resources.getDimension(R.dimen.agenda_view_day_size))
-        textName.setTextSize(TypedValue.COMPLEX_UNIT_PX, view.resources.getDimension(R.dimen.agenda_view_day_name_size))
-
-        textDay.gravity = Gravity.CENTER
-        textName.gravity = Gravity.CENTER
 
         if (day.isToday) {
             textDay.setTextColor(AgendaView.dayCurrentColor)

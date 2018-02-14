@@ -10,7 +10,7 @@ Usage
 Grab it from jitPack:
 
 ```groovy
-    compile 'com.github.jdmbotero:agendaview:1.0.0'
+    compile 'com.github.jdmbotero:agendaview:1.0.1'
 ````
 
 Declare this view in your layout like below.
